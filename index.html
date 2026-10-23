@@ -19,11 +19,31 @@
     --espresso:#3A2618;
     --roast:#7A4E2D;
     --roast-dark:#5E3A20;
+    --heading:#5E3A20;
+    --muted:#5a4636;
     --latte:#C9AE8C;
     --oat:#EDE3D3;
     --card:#FBF6EC;
     --row-alt:#F4ECDE;
     --line:#DCC9AC;
+    --input-bg:#ffffff;
+    --pull-good:#2E7D32;
+    --pull-bad:#B3261E;
+  }
+  :root[data-theme="dark"]{
+    --espresso:#F0E6D8;
+    --roast:#C08552;
+    --roast-dark:#9C6B3F;
+    --heading:#E0B98A;
+    --muted:#C9AE8C;
+    --latte:#8A6B4C;
+    --oat:#1E140D;
+    --card:#2A1D14;
+    --row-alt:#251A12;
+    --line:#4A3726;
+    --input-bg:#332416;
+    --pull-good:#7CD47F;
+    --pull-bad:#FF8A80;
   }
   *{box-sizing:border-box;}
   body{
@@ -33,6 +53,7 @@
     font-family:'Source Sans 3', sans-serif;
     min-height:100vh;
     padding:32px 16px 64px;
+    transition:background .2s ease, color .2s ease;
   }
   .wrap{
     max-width:600px;
@@ -42,9 +63,8 @@
     display:flex;
     align-items:center;
     gap:12px;
-    margin-bottom:28px;
+    margin-bottom:0;
   }
-  header svg{ flex-shrink:0; }
   .brand-logo{
     width:34px;
     height:34px;
@@ -52,6 +72,7 @@
     object-fit:cover;
     flex-shrink:0;
     border:1px solid var(--line);
+    background:#fff;
   }
   h1{
     font-family:'Fraunces', serif;
@@ -60,31 +81,26 @@
     margin:0;
     letter-spacing:-0.01em;
   }
-  .sub{
-    margin:2px 0 0;
-    font-size:0.92rem;
-    color:var(--roast-dark);
-    opacity:0.75;
-  }
   .card{
     background:var(--card);
     border:1px solid var(--line);
     border-radius:10px;
     padding:22px 22px 20px;
     margin-bottom:22px;
+    transition:background .2s ease, border-color .2s ease;
   }
   .card h2{
     font-family:'Fraunces', serif;
     font-size:1.05rem;
     font-weight:500;
     margin:0 0 16px;
-    color:var(--roast-dark);
+    color:var(--heading);
   }
   label{
     display:block;
     font-size:0.82rem;
     font-weight:600;
-    color:var(--roast-dark);
+    color:var(--heading);
     margin-bottom:5px;
   }
   input[type=text], input[type=number]{
@@ -94,10 +110,10 @@
     padding:10px 12px;
     border:1px solid var(--line);
     border-radius:7px;
-    background:#fff;
+    background:var(--input-bg);
     color:var(--espresso);
     outline:none;
-    transition:border-color .15s ease;
+    transition:border-color .15s ease, background .2s ease;
   }
   input[type=text]:focus, input[type=number]:focus{
     border-color:var(--roast);
@@ -117,7 +133,7 @@
     padding:9px 12px;
     margin-bottom:14px;
   }
-  .date-line b{ color:var(--roast-dark); }
+  .date-line b{ color:var(--heading); }
   .reveal{
     max-height:0;
     overflow:hidden;
@@ -125,9 +141,28 @@
     transition:max-height .25s ease, opacity .25s ease;
   }
   .reveal.open{
-    max-height:600px;
+    max-height:700px;
     opacity:1;
   }
+  .grind-hint{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:0.85rem;
+    color:var(--heading);
+    background:var(--row-alt);
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:9px 12px;
+    margin-bottom:14px;
+  }
+  .grind-hint .arrow{
+    font-size:1.05rem;
+    font-weight:700;
+    line-height:1;
+  }
+  .grind-hint.good .arrow{ color:var(--pull-good); }
+  .grind-hint.adjust .arrow{ color:var(--roast); }
   button.primary{
     width:100%;
     background:var(--roast);
@@ -151,7 +186,7 @@
     font-size:0.85rem;
     margin-top:10px;
     min-height:18px;
-    color:var(--roast-dark);
+    color:var(--heading);
   }
   table{
     width:100%;
@@ -167,12 +202,12 @@
     font-size:0.72rem;
     text-transform:uppercase;
     letter-spacing:0.04em;
-    color:var(--roast-dark);
+    color:var(--heading);
     font-weight:600;
   }
   tbody tr:nth-child(odd){ background:var(--row-alt); }
   td.bean-name{ font-weight:600; }
-  td.comments{ color:#5a4636; }
+  td.comments{ color:var(--muted); }
   .del-btn{
     background:none;
     border:none;
@@ -186,7 +221,7 @@
   .empty{
     text-align:center;
     padding:28px 10px;
-    color:var(--roast-dark);
+    color:var(--heading);
     opacity:0.7;
     font-size:0.9rem;
   }
@@ -200,13 +235,10 @@
     gap:12px;
     margin-bottom:28px;
   }
-  header{
-    margin-bottom:0;
-  }
   .history-btn{
     background:none;
     border:none;
-    color:var(--roast-dark);
+    color:var(--heading);
     opacity:0.55;
     font-size:0.8rem;
     font-family:inherit;
@@ -220,7 +252,7 @@
   }
   .history-btn:hover{
     opacity:0.9;
-    text-decoration-color:var(--roast-dark);
+    text-decoration-color:var(--heading);
   }
   .view{ display:none; }
   .view.active{ display:block; }
@@ -234,11 +266,11 @@
     cursor:pointer;
     padding:0 0 18px;
   }
-  .pull-good{ color:#2E7D32; font-weight:600; }
-  .pull-bad{ color:#B3261E; font-weight:600; }
+  .pull-good{ color:var(--pull-good); font-weight:600; }
+  .pull-bad{ color:var(--pull-bad); font-weight:600; }
   .history-row-date{
     font-size:0.78rem;
-    color:var(--roast-dark);
+    color:var(--heading);
     opacity:0.75;
   }
   .install-banner{
@@ -255,7 +287,7 @@
   }
   .install-banner button{
     background:#fff;
-    color:var(--roast-dark);
+    color:#5E3A20;
     border:none;
     border-radius:6px;
     padding:7px 12px;
@@ -263,6 +295,208 @@
     font-size:0.85rem;
     cursor:pointer;
     white-space:nowrap;
+  }
+  .version-footer{
+    text-align:center;
+    margin-top:8px;
+  }
+  .version-footer button{
+    background:none;
+    border:none;
+    color:var(--heading);
+    opacity:0.4;
+    font-family:inherit;
+    font-size:0.75rem;
+    cursor:pointer;
+    padding:8px;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  .version-footer button:hover{ opacity:0.75; }
+
+  /* Settings / changelog modal */
+  .modal-backdrop{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    z-index:100;
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal-sheet{
+    background:var(--card);
+    width:100%;
+    max-width:600px;
+    max-height:85vh;
+    overflow-y:auto;
+    border-radius:16px 16px 0 0;
+    padding:20px 20px 28px;
+    border:1px solid var(--line);
+    border-bottom:none;
+  }
+  .modal-sheet h2{
+    font-family:'Fraunces', serif;
+    font-size:1.2rem;
+    font-weight:600;
+    margin:0 0 2px;
+    color:var(--espresso);
+  }
+  .modal-version-tag{
+    font-size:0.8rem;
+    color:var(--heading);
+    opacity:0.7;
+    margin-bottom:18px;
+  }
+  .modal-section{
+    margin-bottom:22px;
+  }
+  .modal-section h3{
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--heading);
+    margin:0 0 10px;
+    font-weight:700;
+  }
+  .changelog-entry{
+    margin-bottom:14px;
+  }
+  .changelog-entry .v-num{
+    font-weight:700;
+    color:var(--espresso);
+    font-size:0.9rem;
+  }
+  .changelog-entry .v-date{
+    font-size:0.75rem;
+    color:var(--heading);
+    opacity:0.7;
+    margin-left:6px;
+  }
+  .changelog-entry ul{
+    margin:6px 0 0;
+    padding-left:18px;
+    font-size:0.86rem;
+    color:var(--muted);
+  }
+  .changelog-entry li{ margin-bottom:3px; }
+  .setting-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .setting-row:last-child{ border-bottom:none; }
+  .setting-label{
+    font-size:0.9rem;
+    color:var(--espresso);
+  }
+  .setting-sub{
+    font-size:0.76rem;
+    color:var(--muted);
+    margin-top:2px;
+  }
+  .toggle-switch{
+    position:relative;
+    width:46px;
+    height:26px;
+    flex-shrink:0;
+    background:var(--latte);
+    border-radius:13px;
+    border:none;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .toggle-switch.on{ background:var(--roast); }
+  .toggle-switch .knob{
+    position:absolute;
+    top:3px;
+    left:3px;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:#fff;
+    transition:left .15s ease;
+  }
+  .toggle-switch.on .knob{ left:23px; }
+  .seg-toggle{
+    display:flex;
+    border:1px solid var(--line);
+    border-radius:7px;
+    overflow:hidden;
+    width:100%;
+    margin-top:8px;
+  }
+  .seg-toggle button{
+    flex:1;
+    background:var(--card);
+    border:none;
+    padding:9px 6px;
+    font-size:0.8rem;
+    font-family:inherit;
+    color:var(--espresso);
+    cursor:pointer;
+  }
+  .seg-toggle button.active{
+    background:var(--roast);
+    color:#fff;
+    font-weight:600;
+  }
+  .sheet-input{
+    width:100%;
+    font-family:inherit;
+    font-size:0.85rem;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:var(--input-bg);
+    color:var(--espresso);
+    outline:none;
+    margin-top:8px;
+  }
+  .sheet-btn-row{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+  }
+  .sheet-btn-row button{
+    flex:1;
+    font-family:inherit;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:9px;
+    border-radius:7px;
+    cursor:pointer;
+    border:1px solid var(--roast);
+  }
+  .sheet-btn-row .save-btn{
+    background:var(--roast);
+    color:#fff;
+    border:none;
+  }
+  .sheet-btn-row .sync-btn{
+    background:none;
+    color:var(--roast);
+  }
+  .sync-status{
+    font-size:0.76rem;
+    color:var(--muted);
+    margin-top:8px;
+    min-height:14px;
+  }
+  .modal-close{
+    display:block;
+    margin:18px auto 0;
+    background:none;
+    border:none;
+    color:var(--heading);
+    opacity:0.6;
+    font-size:0.85rem;
+    cursor:pointer;
+    padding:8px;
   }
 </style>
 </head>
@@ -294,6 +528,10 @@
 
       <div id="revealSection" class="reveal">
         <div class="date-line">Logging for <b id="todayLabel"></b></div>
+        <div id="grindHint" class="grind-hint" style="display:none;">
+          <span class="arrow" id="grindHintArrow"></span>
+          <span id="grindHintText"></span>
+        </div>
         <div class="row2">
           <div class="field">
             <label for="grindInput">Grind size</label>
@@ -332,6 +570,10 @@
         <div class="empty" id="emptyMsg" style="display:none;">No beans logged yet — add your first one above.</div>
       </div>
     </div>
+
+    <div class="version-footer">
+      <button id="versionBtn">v1.1.0</button>
+    </div>
   </div>
 
   <div class="view" id="historyView">
@@ -357,11 +599,81 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-sheet" id="modalSheet">
+    <h2>Beanly</h2>
+    <div class="modal-version-tag">Version <span id="modalVersion"></span></div>
+
+    <div class="modal-section">
+      <h3>Settings</h3>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Dark mode</div>
+        </div>
+        <button class="toggle-switch" id="themeToggle"><span class="knob"></span></button>
+      </div>
+      <div class="setting-row" style="display:block;">
+        <div class="setting-label">Grinder direction</div>
+        <div class="setting-sub">Which way does your grinder go to get a finer grind?</div>
+        <div class="seg-toggle" id="grindDirToggle">
+          <button data-dir="lowerFiner">Lower = finer</button>
+          <button data-dir="higherFiner">Higher = finer</button>
+        </div>
+      </div>
+      <div class="setting-row" style="display:block;">
+        <div class="setting-label">Google Sheet sync</div>
+        <div class="setting-sub">Paste your Apps Script web app URL to sync across devices.</div>
+        <input type="text" class="sheet-input" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+        <div class="sheet-btn-row">
+          <button class="save-btn" id="sheetSaveBtn">Save</button>
+          <button class="sync-btn" id="sheetSyncBtn">Sync now</button>
+        </div>
+        <div class="sync-status" id="syncStatus"></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3>What's new</h3>
+      <div id="changelogList"></div>
+    </div>
+
+    <button class="modal-close" id="modalCloseBtn">Close</button>
+  </div>
+</div>
+
 <script>
+const APP_VERSION = '1.1.0';
+const CHANGELOG = [
+  {
+    version: '1.1.0',
+    date: 'Oct 2026',
+    items: [
+      'Grind finer/coarser suggestions based on your last pull time for that bean',
+      'Adjustable grinder direction setting (lower or higher number = finer)',
+      'Light/dark mode',
+      'Google Sheet sync so your log follows you across devices',
+      'This version/changelog popup'
+    ]
+  },
+  {
+    version: '1.0.0',
+    date: 'Sep 2026',
+    items: [
+      'Log a brew: bean name, date, grind size, pull time, comments',
+      'Beans table showing the last brew per bean',
+      'Full brew history page',
+      'Pull time shown in green (25–35s) or red (outside that range)',
+      'Installable as a PWA with offline support'
+    ]
+  }
+];
+
 const STORAGE_KEY = 'coffee-beans-data';
 const HISTORY_KEY = 'coffee-log-history';
+const SETTINGS_KEY = 'beanly-settings';
 let beans = {};
 let logs = [];
+let settings = { theme: null, grindDirection: 'lowerFiner', sheetUrl: '' };
 
 const beanInput = document.getElementById('beanInput');
 const beanOptions = document.getElementById('beanOptions');
@@ -380,6 +692,9 @@ const mainView = document.getElementById('mainView');
 const historyView = document.getElementById('historyView');
 const historyBody = document.getElementById('historyBody');
 const historyEmptyMsg = document.getElementById('historyEmptyMsg');
+const grindHint = document.getElementById('grindHint');
+const grindHintArrow = document.getElementById('grindHintArrow');
+const grindHintText = document.getElementById('grindHintText');
 
 function todayStr(){
   const d = new Date();
@@ -456,6 +771,7 @@ function renderTable(){
       saveData();
       renderOptions();
       renderTable();
+      pushToSheet();
     });
   });
 }
@@ -485,17 +801,52 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 
+// --- Grind recommendation ---
+function showGrindHint(name){
+  const existing = beans[name];
+  if(!existing || existing.pullTime == null){
+    grindHint.style.display = 'none';
+    return;
+  }
+  const pt = existing.pullTime;
+  grindHint.style.display = 'flex';
+  grindHint.classList.remove('good','adjust');
+
+  if(pt >= 25 && pt <= 35){
+    grindHint.classList.add('good');
+    grindHintArrow.textContent = '✓';
+    grindHintText.textContent = `Last pull was ${pt}s — dialed in. Same grind should work.`;
+    return;
+  }
+
+  const needFiner = pt < 25;
+  const lowerIsFiner = settings.grindDirection === 'lowerFiner';
+  const goLower = needFiner ? lowerIsFiner : !lowerIsFiner;
+  const arrow = goLower ? '↓' : '↑';
+  const numberHint = goLower ? 'a lower number' : 'a higher number';
+  const adjective = needFiner ? 'finer' : 'coarser';
+  const reason = needFiner ? 'too fast' : 'too slow';
+
+  grindHint.classList.add('adjust');
+  grindHintArrow.textContent = arrow;
+  grindHintText.textContent = `Last pull was ${pt}s (${reason}) — try ${adjective}, ${numberHint}.`;
+}
+
 beanInput.addEventListener('input', ()=>{
-  const hasValue = beanInput.value.trim().length > 0;
+  const name = beanInput.value.trim();
+  const hasValue = name.length > 0;
   revealSection.classList.toggle('open', hasValue);
   if(hasValue){
     todayLabel.textContent = todayStr();
-    const existing = beans[beanInput.value.trim()];
+    const existing = beans[name];
     if(existing){
       grindInput.value = existing.grindSize ?? '';
       timeInput.value = existing.pullTime ?? '';
       commentsInput.value = existing.comments ?? '';
     }
+    showGrindHint(name);
+  } else {
+    grindHint.style.display = 'none';
   }
   statusMsg.textContent = '';
 });
@@ -538,7 +889,10 @@ saveBtn.addEventListener('click', ()=>{
   timeInput.value = '';
   commentsInput.value = '';
   revealSection.classList.remove('open');
+  grindHint.style.display = 'none';
   statusMsg.textContent = `Logged ${name}.`;
+
+  pushToSheet();
 });
 
 historyToggleBtn.addEventListener('click', ()=>{
@@ -552,6 +906,142 @@ backBtn.addEventListener('click', ()=>{
 });
 
 loadData();
+
+// --- Settings (theme, grind direction, sheet sync) ---
+function loadSettings(){
+  try{
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if(raw) settings = Object.assign(settings, JSON.parse(raw));
+  }catch(e){}
+  if(!settings.theme){
+    settings.theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  applyTheme();
+}
+function saveSettings(){
+  try{
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }catch(e){}
+}
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', settings.theme);
+  themeToggle.classList.toggle('on', settings.theme === 'dark');
+}
+
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', ()=>{
+  settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
+  applyTheme();
+  saveSettings();
+});
+
+const grindDirToggle = document.getElementById('grindDirToggle');
+function applyGrindDirUI(){
+  grindDirToggle.querySelectorAll('button').forEach(btn=>{
+    btn.classList.toggle('active', btn.getAttribute('data-dir') === settings.grindDirection);
+  });
+}
+grindDirToggle.addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-dir]');
+  if(!btn) return;
+  settings.grindDirection = btn.getAttribute('data-dir');
+  applyGrindDirUI();
+  saveSettings();
+});
+
+// --- Modal ---
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalSheet = document.getElementById('modalSheet');
+const versionBtn = document.getElementById('versionBtn');
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+const sheetUrlInput = document.getElementById('sheetUrlInput');
+const sheetSaveBtn = document.getElementById('sheetSaveBtn');
+const sheetSyncBtn = document.getElementById('sheetSyncBtn');
+const syncStatus = document.getElementById('syncStatus');
+
+function openModal(){
+  document.getElementById('modalVersion').textContent = APP_VERSION;
+  sheetUrlInput.value = settings.sheetUrl || '';
+  applyGrindDirUI();
+  modalBackdrop.classList.add('open');
+}
+function closeModal(){
+  modalBackdrop.classList.remove('open');
+}
+versionBtn.textContent = 'v' + APP_VERSION;
+versionBtn.addEventListener('click', openModal);
+modalCloseBtn.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', (e)=>{
+  if(e.target === modalBackdrop) closeModal();
+});
+
+function renderChangelog(){
+  const list = document.getElementById('changelogList');
+  list.innerHTML = CHANGELOG.map(entry => `
+    <div class="changelog-entry">
+      <span class="v-num">v${entry.version}</span><span class="v-date">${entry.date}</span>
+      <ul>${entry.items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul>
+    </div>
+  `).join('');
+}
+renderChangelog();
+
+// --- Google Sheet sync ---
+function setSyncStatus(msg){
+  syncStatus.textContent = msg;
+}
+
+async function pushToSheet(){
+  if(!settings.sheetUrl) return;
+  try{
+    await fetch(settings.sheetUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ beans, logs })
+    });
+    setSyncStatus('Synced ' + new Date().toLocaleTimeString());
+  }catch(e){
+    setSyncStatus("Couldn't reach the sheet — check the URL.");
+  }
+}
+
+async function pullFromSheet(showStatus){
+  if(!settings.sheetUrl) return;
+  if(showStatus) setSyncStatus('Syncing…');
+  try{
+    const res = await fetch(settings.sheetUrl, { method: 'GET' });
+    const data = await res.json();
+    if(data && data.beans){
+      beans = data.beans;
+      logs = data.logs || [];
+      saveData();
+      renderOptions();
+      renderTable();
+      renderHistory();
+    }
+    if(showStatus) setSyncStatus('Synced ' + new Date().toLocaleTimeString());
+  }catch(e){
+    if(showStatus) setSyncStatus("Couldn't reach the sheet — check the URL.");
+  }
+}
+
+sheetSaveBtn.addEventListener('click', ()=>{
+  settings.sheetUrl = sheetUrlInput.value.trim();
+  saveSettings();
+  setSyncStatus(settings.sheetUrl ? 'Saved.' : 'Sync disabled.');
+  if(settings.sheetUrl) pullFromSheet(true);
+});
+sheetSyncBtn.addEventListener('click', ()=>{
+  if(!settings.sheetUrl){
+    setSyncStatus('Add and save a sheet URL first.');
+    return;
+  }
+  pullFromSheet(true);
+});
+
+loadSettings();
+if(settings.sheetUrl) pullFromSheet(false);
 
 // --- PWA install prompt (Android/Chrome) ---
 let deferredPrompt;
