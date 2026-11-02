@@ -31,6 +31,7 @@
     --pull-bad:#B3261E;
     --danger:#B3261E;
     --ease:cubic-bezier(.2,.8,.2,1);
+    color-scheme:light;
   }
   :root[data-theme="dark"]{
     --espresso:#F0E6D8;
@@ -47,6 +48,7 @@
     --pull-good:#7CD47F;
     --pull-bad:#FF8A80;
     --danger:#C0392B;
+    color-scheme:dark;
   }
   *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html{ -webkit-text-size-adjust:100%; }
@@ -103,7 +105,7 @@
 
   /* ---------- views + transitions ---------- */
   .view{ display:none; }
-  .view.active{ display:block; animation:viewIn .28s var(--ease) both; }
+  .view.active{ display:block; animation:viewIn .28s var(--ease); }
   .view.active.back{ animation-name:viewInBack; }
   @keyframes viewIn{ from{opacity:0; transform:translateX(18px)} to{opacity:1; transform:none} }
   @keyframes viewInBack{ from{opacity:0; transform:translateX(-18px)} to{opacity:1; transform:none} }
@@ -159,7 +161,7 @@
   }
   .card.flush{ padding:2px 18px 6px; }
   label{ display:block; font-size:.8rem; font-weight:600; color:var(--heading); margin-bottom:5px; }
-  input[type=text], input[type=number]{
+  input[type=text], input[type=number], input[type=date]{
     width:100%;
     font-family:inherit;
     font-size:1rem;
@@ -171,7 +173,7 @@
     outline:none;
     transition:border-color .15s ease, box-shadow .15s ease, background .25s ease;
   }
-  input[type=text]:focus, input[type=number]:focus{
+  input[type=text]:focus, input[type=number]:focus, input[type=date]:focus{
     border-color:var(--roast);
     box-shadow:0 0 0 3px color-mix(in srgb, var(--roast) 22%, transparent);
   }
@@ -448,6 +450,162 @@
   .version-footer button:hover{ opacity:.75; }
   .version-footer button.holding{ opacity:.85; }
 
+  /* ---------- v1.4: gear, chips, edit sheet, steppers ---------- */
+  input[type=date]{ appearance:none; -webkit-appearance:none; min-height:46px; text-align:left; }
+  .top-actions{ display:flex; align-items:center; gap:2px; }
+  .gear-btn{
+    width:38px; height:38px;
+    border-radius:50%;
+    border:none;
+    background:none;
+    color:var(--heading);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    opacity:.8;
+    transition:opacity .15s ease, transform .35s var(--ease), background .15s ease;
+  }
+  .gear-btn svg{ width:22px; height:22px; }
+  .gear-btn:hover{ opacity:1; }
+  .gear-btn:active:not(:disabled){ transform:rotate(35deg) scale(.94); background:var(--row-alt); }
+  .chips-label{ font-size:.64rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--muted); margin-top:11px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:7px; margin-top:7px; }
+  .chips:empty{ display:none; }
+  .chip{
+    max-width:min(100%, 16em);
+    background:var(--row-alt);
+    color:var(--espresso);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:6px 13px;
+    font-size:.82rem;
+    font-weight:500;
+    cursor:pointer;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    transition:background .15s ease, border-color .15s ease, transform .1s ease;
+  }
+  .chips.anim .chip{ animation:chipIn .28s var(--ease) both; animation-delay:calc(var(--i, 0) * 35ms); }
+  .chip.more{ background:none; border-style:dashed; color:var(--roast); font-weight:600; }
+  .chip:hover{ border-color:var(--roast); }
+  @keyframes chipIn{ from{opacity:0; transform:translateY(5px) scale(.96)} to{opacity:1; transform:none} }
+  .page-hint{ font-size:.76rem; color:var(--muted); margin:-6px 2px 12px; }
+  .m-sect.first{ border-top:none; margin-top:2px; padding-top:0; }
+  .sm:disabled{ opacity:.45; cursor:default; }
+  .stepper{ display:flex; align-items:center; border:1px solid var(--line); border-radius:9px; overflow:hidden; }
+  .stepper button{
+    width:36px; height:34px;
+    background:none; border:none;
+    color:var(--roast);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .stepper button:active:not(:disabled){ transform:none; background:var(--row-alt); }
+  .stepper button svg{ width:16px; height:16px; }
+  .stepper b{ min-width:50px; text-align:center; font-size:.86rem; font-weight:600; font-variant-numeric:tabular-nums; }
+  .reset-row{ margin-top:6px; }
+
+  .sheet-backdrop{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.5);
+    z-index:100;
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .22s ease;
+  }
+  .sheet-backdrop.open{ opacity:1; pointer-events:auto; }
+  .edit-sheet{
+    background:var(--card);
+    width:100%;
+    max-width:600px;
+    max-height:92vh;
+    overflow-y:auto;
+    border:1px solid var(--line);
+    border-bottom:none;
+    border-radius:18px 18px 0 0;
+    padding:8px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+    transform:translateY(100%);
+    transition:transform .34s var(--ease);
+  }
+  .sheet-backdrop.open .edit-sheet{ transform:none; }
+  .sheet-grip{ width:36px; height:4px; border-radius:2px; background:var(--line); margin:4px auto 12px; }
+  .edit-sheet .m-head{ margin-bottom:12px; }
+  .edit-actions{ display:grid; grid-template-columns:auto 1fr; gap:10px; margin-top:2px; }
+  .edit-actions button.primary{ margin-top:0; }
+  .danger-btn{
+    display:flex; align-items:center; gap:7px;
+    background:none;
+    border:1px solid var(--pull-bad);
+    color:var(--pull-bad);
+    border-radius:10px;
+    padding:0 16px;
+    font-size:.92rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .danger-btn svg{ width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .link-btn{
+    display:block;
+    margin:12px auto 0;
+    background:none; border:none;
+    color:var(--roast);
+    font-size:.84rem;
+    font-weight:600;
+    cursor:pointer;
+    padding:6px 10px;
+  }
+
+
+  /* ---------- bean page: columns with icons, floating log button, swipe back ---------- */
+  .brew-head, .hist-row.brew-row{
+    display:grid;
+    grid-template-columns:44px 52px 52px minmax(0,1fr);
+    gap:8px;
+    align-items:center;
+  }
+  .brew-head{
+    align-items:end;
+    padding:8px 0 7px;
+    border-bottom:1px solid var(--line);
+    font-size:.6rem;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    font-weight:700;
+    color:var(--heading);
+  }
+  .brew-head span{ display:flex; flex-direction:column; align-items:center; gap:3px; white-space:nowrap; }
+  .brew-head span:last-child{ align-items:flex-start; }
+  .brew-head svg{ width:16px; height:16px; }
+  .brew-head + .hist-row{ border-top:none; }
+  .hist-row.brew-row{ padding:9px 0; }
+  .brew-row .bv{ text-align:center; font-variant-numeric:tabular-nums; font-size:.96rem; }
+  .brew-row .bnote{ font-size:.76rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #detailView{ padding-bottom:84px; touch-action:pan-y; }
+  #historyView{ touch-action:pan-y; }
+  .fab{
+    position:fixed;
+    right:18px;
+    bottom:calc(20px + env(safe-area-inset-bottom, 0px));
+    width:58px; height:58px;
+    border-radius:50%;
+    border:none;
+    background:var(--roast);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 22px rgba(0,0,0,.32);
+    cursor:pointer;
+    z-index:90;
+    opacity:0;
+    transform:scale(.4) rotate(-45deg);
+    pointer-events:none;
+    transition:transform .34s var(--ease), opacity .2s ease, background .15s ease;
+  }
+  .fab svg{ width:26px; height:26px; }
+  body[data-view="detail"] .fab{ opacity:1; transform:none; pointer-events:auto; }
+  body[data-view="detail"] .fab:hover{ background:var(--roast-dark); }
+  body[data-view="detail"] .fab:active{ transform:scale(.92); }
+  body[data-view="detail"] .toast{ bottom:calc(90px + env(safe-area-inset-bottom, 0px)); }
+
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation-duration:.01ms !important; animation-delay:0ms !important; transition-duration:.01ms !important; }
   }
@@ -607,7 +765,10 @@
       <img src="icon-192.png" alt="Beanly logo" class="brand-logo">
       <h1>Beanly</h1>
     </header>
-    <button class="history-btn" id="historyToggleBtn">History</button>
+    <div class="top-actions">
+      <button class="history-btn" id="historyToggleBtn">History</button>
+      <button class="gear-btn" id="settingsBtn" aria-label="Settings"><svg class="ic" viewBox="0 0 24 24"><path d="M9.87 5.02 L10.45 2.22 L13.55 2.22 L14.13 5.02 L15.43 5.55 L17.82 3.99 L20.01 6.18 L18.45 8.57 L18.98 9.87 L21.78 10.45 L21.78 13.55 L18.98 14.13 L18.45 15.43 L20.01 17.82 L17.82 20.01 L15.43 18.45 L14.13 18.98 L13.55 21.78 L10.45 21.78 L9.87 18.98 L8.57 18.45 L6.18 20.01 L3.99 17.82 L5.55 15.43 L5.02 14.13 L2.22 13.55 L2.22 10.45 L5.02 9.87 L5.55 8.57 L3.99 6.18 L6.18 3.99 L8.57 5.55 Z"/><circle cx="12" cy="12" r="3.1"/></svg></button>
+    </div>
   </div>
 
   <div class="install-banner" id="installBanner">
@@ -620,8 +781,10 @@
       <h2>Log a brew</h2>
       <div class="field">
         <label for="beanInput">Bean</label>
-        <input type="text" id="beanInput" list="beanOptions" placeholder="Type or pick a bean name" autocomplete="off" enterkeyhint="next">
+        <input type="text" id="beanInput" placeholder="Type or tap a bean below" autocomplete="off" enterkeyhint="next">
         <datalist id="beanOptions"></datalist>
+        <div class="chips-label" id="chipsLabel">Recent beans</div>
+        <div class="chips anim" id="beanChips"></div>
       </div>
 
       <div id="revealSection" class="reveal">
@@ -662,13 +825,14 @@
     </div>
 
     <div class="version-footer">
-      <button id="versionBtn">v1.3.0</button>
+      <button id="versionBtn">v1.4.0</button>
     </div>
   </div>
 
   <div class="view" id="historyView">
     <button class="back-btn" id="backBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back</button>
     <div class="page-title">History <span class="count" id="histCount"></span></div>
+    <div class="page-hint">Tap a brew to edit or delete it</div>
     <div class="card flush">
       <div id="historyList"></div>
       <div class="empty" id="historyEmptyMsg" style="display:none;">No brews logged yet.</div>
@@ -684,13 +848,20 @@
       <div id="detailChart"></div>
     </div>
     <div class="card flush">
-      <div class="hist-month">All brews</div>
+      <div class="hist-month">All brews · tap to edit</div>
+      <div class="brew-head">
+        <span><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Date</span>
+        <span><svg class="ic" viewBox="0 0 24 24"><circle cx="4.4" cy="12" r="1.2"/><circle cx="10.4" cy="12" r="2.4"/><circle cx="18.2" cy="12" r="3.9"/></svg>Grind</span>
+        <span><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.6 1.6M9.5 3h5"/></svg>Pull</span>
+        <span>Notes</span>
+      </div>
       <div id="detailList"></div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg"></span><button id="toastBtn">Undo</button></div>
+<button class="fab" id="fabBtn" aria-label="Log a brew for this bean"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
 
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal-sheet" id="modalSheet">
@@ -707,14 +878,7 @@
 
     <div id="changelogList"></div>
 
-    <div class="m-sect">Settings</div>
-    <div class="m-row">
-      <span>Lower number is</span>
-      <div class="pill" id="grindDirToggle">
-        <button data-dir="lowerFiner">Finer</button>
-        <button data-dir="higherFiner">Coarser</button>
-      </div>
-    </div>
+    <div class="m-sect">Sync &amp; data</div>
     <div class="m-label">Google Sheet sync</div>
     <div class="sheet-row">
       <input type="text" class="sheet-input" id="sheetUrlInput" placeholder="Apps Script web app URL">
@@ -734,9 +898,149 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="settingsBackdrop">
+  <div class="modal-sheet" id="settingsSheet">
+    <div class="m-head">
+      <div>
+        <div class="m-title">Settings</div>
+        <div class="m-sub">Saved on this device</div>
+      </div>
+      <button class="icon-btn" id="settingsCloseBtn" aria-label="Close settings">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="m-sect first">Grinder</div>
+    <div class="m-row">
+      <span>Lower number is</span>
+      <div class="pill" id="grindDirToggle">
+        <button data-dir="lowerFiner">Finer</button>
+        <button data-dir="higherFiner">Coarser</button>
+      </div>
+    </div>
+    <div class="m-note">Used for the finer / coarser suggestion when you pick a bean.</div>
+
+    <div class="m-sect">Target pull time</div>
+    <div class="m-row">
+      <span>Fastest good pull</span>
+      <div class="stepper" data-key="targetMin">
+        <button data-d="-1" aria-label="Decrease fastest pull"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+        <b id="tMinVal"></b>
+        <button data-d="1" aria-label="Increase fastest pull"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+    </div>
+    <div class="m-row">
+      <span>Slowest good pull</span>
+      <div class="stepper" data-key="targetMax">
+        <button data-d="-1" aria-label="Decrease slowest pull"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+        <b id="tMaxVal"></b>
+        <button data-d="1" aria-label="Increase slowest pull"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+    </div>
+    <div class="m-note">Pulls inside this window show green, outside show red. Suggestions, the sweet spot and the chart use it too.</div>
+    <div class="reset-row"><button class="sm" id="targetResetBtn">Reset to 25–35 s</button></div>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="editBackdrop">
+  <div class="edit-sheet" id="editSheet" role="dialog" aria-label="Edit brew">
+    <div class="sheet-grip"></div>
+    <div class="m-head">
+      <div>
+        <div class="m-title">Edit brew</div>
+        <div class="m-sub" id="editSub"></div>
+      </div>
+      <button class="icon-btn" id="editCloseBtn" aria-label="Close">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="field">
+      <label for="editName">Bean</label>
+      <input type="text" id="editName" list="beanOptions" autocomplete="off">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="editDate">Date</label>
+        <input type="date" id="editDate">
+      </div>
+      <div class="field">
+        <label for="editGrind">Grind size</label>
+        <input type="number" id="editGrind" step="0.1" inputmode="decimal">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="editTime">Pull time (sec)</label>
+        <input type="number" id="editTime" step="1" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="editComments">Comments</label>
+        <input type="text" id="editComments" autocomplete="off">
+      </div>
+    </div>
+    <div class="edit-actions">
+      <button class="danger-btn" id="editDeleteBtn"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9.5 7V4.5h5V7"/><path d="M6 7l.9 12a1 1 0 0 0 1 .9h8.2a1 1 0 0 0 1-.9L18 7"/><path d="M10 11v5M14 11v5"/></svg>Delete</button>
+      <button class="primary" id="editSaveBtn">Save changes</button>
+    </div>
+    <button class="link-btn" id="editViewBean" style="display:none;">View all brews of this bean</button>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="logBackdrop">
+  <div class="edit-sheet" id="logSheet" role="dialog" aria-label="Log a brew">
+    <div class="sheet-grip"></div>
+    <div class="m-head">
+      <div>
+        <div class="m-title">Log a brew</div>
+        <div class="m-sub" id="logSub"></div>
+      </div>
+      <button class="icon-btn" id="logCloseBtn" aria-label="Close">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div id="logHint" class="grind-hint" style="display:none;">
+      <span class="arrow" id="logHintArrow"></span>
+      <span id="logHintText"></span>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="logGrind">Grind size</label>
+        <input type="number" id="logGrind" step="0.1" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="logTime">Pull time (sec)</label>
+        <input type="number" id="logTime" step="1" inputmode="numeric">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="logDate">Date</label>
+        <input type="date" id="logDate">
+      </div>
+      <div class="field">
+        <label for="logComments">Comments</label>
+        <input type="text" id="logComments" placeholder="Optional" autocomplete="off">
+      </div>
+    </div>
+    <button class="primary" id="logSaveBtn">Log brew</button>
+  </div>
+</div>
+
 <script>
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.4.0';
 const CHANGELOG = [
+  {
+    version: '1.4.0',
+    date: '2 Nov 2026',
+    items: [
+      'Edit or delete any past brew: tap it in History or on a bean’s page',
+      'All your current beans show as tap-to-select chips on the log form, most recent first',
+      'Bean page: round + button to log a brew right there, swipe right to go back, and clearer Date / Grind / Pull columns',
+      'New Settings (gear, top right): grinder direction moved here, plus an adjustable target pull-time window',
+      'Shorter finer / coarser suggestion',
+      'Dates now use your local day, and sync carries brew edits and deletions between devices'
+    ]
+  },
   {
     version: '1.3.0',
     date: '2 Nov 2026',
@@ -786,10 +1090,12 @@ const STORAGE_KEY = 'coffee-beans-data';
 const HISTORY_KEY = 'coffee-log-history';
 const REMOVED_KEY = 'beanly-removed';
 const SETTINGS_KEY = 'beanly-settings';
+const REMOVED_LOGS_KEY = 'beanly-removed-logs';
 let beans = {};
 let logs = [];
 let removed = {};
-let settings = { theme: null, grindDirection: 'lowerFiner', sheetUrl: '', swipeHint: false };
+let removedLogs = {};
+let settings = { theme: null, grindDirection: 'lowerFiner', sheetUrl: '', swipeHint: false, targetMin: 25, targetMax: 35 };
 
 const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 const ACTION_W = 60;
@@ -832,6 +1138,38 @@ const grindHintText = $('grindHintText');
 const toastEl = $('toast');
 const toastMsg = $('toastMsg');
 const toastBtn = $('toastBtn');
+const settingsBtn = $('settingsBtn');
+const settingsBackdrop = $('settingsBackdrop');
+const settingsSheet = $('settingsSheet');
+const settingsCloseBtn = $('settingsCloseBtn');
+const tMinVal = $('tMinVal');
+const tMaxVal = $('tMaxVal');
+const targetResetBtn = $('targetResetBtn');
+const beanChips = $('beanChips');
+const editBackdrop = $('editBackdrop');
+const editName = $('editName');
+const editDate = $('editDate');
+const editGrind = $('editGrind');
+const editTime = $('editTime');
+const editComments = $('editComments');
+const editSub = $('editSub');
+const editSaveBtn = $('editSaveBtn');
+const editDeleteBtn = $('editDeleteBtn');
+const editCloseBtn = $('editCloseBtn');
+const editViewBean = $('editViewBean');
+const fabBtn = $('fabBtn');
+const chipsLabel = $('chipsLabel');
+const logBackdrop = $('logBackdrop');
+const logSub = $('logSub');
+const logGrind = $('logGrind');
+const logTime = $('logTime');
+const logDate = $('logDate');
+const logComments = $('logComments');
+const logSaveBtn = $('logSaveBtn');
+const logCloseBtn = $('logCloseBtn');
+const logHint = $('logHint');
+const logHintArrow = $('logHintArrow');
+const logHintText = $('logHintText');
 
 const ICONS = {
   archive: '<svg viewBox="0 0 24 24"><path d="M3.5 4.5h17v4h-17z"/><path d="M5 8.5V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8.5"/><path d="M10 12.5h4"/></svg>',
@@ -849,7 +1187,12 @@ function todayStr(){
   return new Date().toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
 }
 function isoToday(){
-  return new Date().toISOString().slice(0,10);
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function displayDate(iso){
+  const d = parseISO(iso);
+  return d ? d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }) : todayStr();
 }
 function parseISO(d){
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || '');
@@ -875,9 +1218,12 @@ function readJSON(key, fallback){
     return fallback;
   }
 }
+function tMin(){ const v = Number(settings.targetMin); return v > 0 ? v : 25; }
+function tMax(){ const v = Number(settings.targetMax); return v > tMin() ? v : Math.max(35, tMin() + 2); }
+function inTarget(pt){ return pt != null && pt !== '' && pt >= tMin() && pt <= tMax(); }
 function pullTimeClass(pt){
   if(pt == null || pt === '') return '';
-  return (pt >= 25 && pt <= 35) ? 'pull-good' : 'pull-bad';
+  return inTarget(pt) ? 'pull-good' : 'pull-bad';
 }
 function sortedLogsDesc(list){
   return [...list].sort((a,b)=> ((b.date||'') + b.id).localeCompare((a.date||'') + a.id));
@@ -898,6 +1244,7 @@ function loadData(){
   beans = readJSON(STORAGE_KEY, {});
   logs = readJSON(HISTORY_KEY, []);
   removed = readJSON(REMOVED_KEY, {});
+  removedLogs = readJSON(REMOVED_LOGS_KEY, {});
   renderAll();
 }
 function saveData(){
@@ -905,6 +1252,7 @@ function saveData(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(beans));
     localStorage.setItem(HISTORY_KEY, JSON.stringify(logs));
     localStorage.setItem(REMOVED_KEY, JSON.stringify(removed));
+    localStorage.setItem(REMOVED_LOGS_KEY, JSON.stringify(removedLogs));
   }catch(e){
     statusMsg.textContent = "Couldn't save — storage may be full.";
   }
@@ -1122,7 +1470,16 @@ function histRow(e, showName){
   const main = `<div class="hist-name">${showName ? escapeHtml(e.name) : 'Grind ' + escapeHtml(grind)}</div>${note}`;
   const right = `<div class="hist-pull ${pullTimeClass(e.pullTime)}">${pull}</div>` +
                 (showName ? `<div class="hist-grind">grind ${escapeHtml(grind)}</div>` : '');
-  return `<div class="hist-row${showName ? '' : ' static'}" data-name="${escapeHtml(e.name)}"${showName ? ' role="button" tabindex="0"' : ''}>${dateBlock(e.date, e.dateDisplay)}<div class="hist-main">${main}</div><div class="hist-right">${right}</div></div>`;
+  return `<div class="hist-row" data-id="${escapeHtml(e.id)}" data-name="${escapeHtml(e.name)}" role="button" tabindex="0">${dateBlock(e.date, e.dateDisplay)}<div class="hist-main">${main}</div><div class="hist-right">${right}</div></div>`;
+}
+
+function brewRow(e){
+  const grind = e.grindSize != null ? e.grindSize : '–';
+  const pull = e.pullTime != null ? e.pullTime + 's' : '–';
+  return `<div class="hist-row brew-row" data-id="${escapeHtml(e.id)}" data-name="${escapeHtml(e.name)}" role="button" tabindex="0">` +
+    dateBlock(e.date, e.dateDisplay) +
+    `<div class="bv">${escapeHtml(grind)}</div><div class="bv ${pullTimeClass(e.pullTime)}">${pull}</div>` +
+    `<div class="bnote">${escapeHtml(e.comments || '')}</div></div>`;
 }
 
 function renderHistory(){
@@ -1146,7 +1503,7 @@ function beanStats(asc){
   const avg = pulls.length ? Math.round(pulls.reduce((s, r) => s + r.pullTime, 0) / pulls.length) : null;
   const tally = {};
   asc.forEach((r, i)=>{
-    if(r.pullTime != null && r.pullTime >= 25 && r.pullTime <= 35 && r.grindSize != null){
+    if(inTarget(r.pullTime) && r.grindSize != null){
       const k = String(r.grindSize);
       if(!tally[k]) tally[k] = { grind: r.grindSize, count: 0, last: 0 };
       tally[k].count++; tally[k].last = i;
@@ -1161,19 +1518,19 @@ function chartSVG(asc){
   if(!pts.length) return '<div class="empty">No pull times logged yet.</div>';
   const W = 320, H = 124, L = 28, R = 10, T = 10, B = 22;
   const vals = pts.map(p => p.pullTime);
-  const lo = Math.floor(Math.min(15, Math.min.apply(null, vals) - 3) / 5) * 5;
-  const hi = Math.ceil(Math.max(45, Math.max.apply(null, vals) + 3) / 5) * 5;
+  const lo = Math.max(0, Math.floor(Math.min(tMin() - 10, Math.min.apply(null, vals) - 3) / 5) * 5);
+  const hi = Math.ceil(Math.max(tMax() + 10, Math.max.apply(null, vals) + 3) / 5) * 5;
   const y = v => T + (hi - v) / (hi - lo) * (H - T - B);
   const n = pts.length;
   const x = i => n === 1 ? L + (W - L - R) / 2 : L + i * (W - L - R) / (n - 1);
-  const band = `<rect x="${L}" y="${y(35).toFixed(1)}" width="${W - L - R}" height="${(y(25) - y(35)).toFixed(1)}" fill="var(--pull-good)" opacity=".13" rx="3"/>`;
-  const labels = [25, 35].map(v => `<text x="${L - 5}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end" class="ch-t">${v}</text>`).join('');
+  const band = `<rect x="${L}" y="${y(tMax()).toFixed(1)}" width="${W - L - R}" height="${(y(tMin()) - y(tMax())).toFixed(1)}" fill="var(--pull-good)" opacity=".13" rx="3"/>`;
+  const labels = [tMin(), tMax()].map(v => `<text x="${L - 5}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end" class="ch-t">${v}</text>`).join('');
   const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.pullTime).toFixed(1)}`).join(' ');
   const line = n > 1 ? `<path d="${d}" pathLength="1" class="ch-line" fill="none"/>` : '';
-  const dots = pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.pullTime).toFixed(1)}" r="3.4" class="ch-dot ${p.pullTime >= 25 && p.pullTime <= 35 ? 'g' : 'b'}" style="animation-delay:${Math.min(i * 25, 600) + 250}ms"/>`).join('');
+  const dots = pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.pullTime).toFixed(1)}" r="3.4" class="ch-dot ${inTarget(p.pullTime) ? 'g' : 'b'}" style="animation-delay:${Math.min(i * 25, 600) + 250}ms"/>`).join('');
   const x1 = `<text x="${L}" y="${H - 5}" class="ch-t">${escapeHtml(shortDate(pts[0].date))}</text>`;
   const x2 = n > 1 ? `<text x="${W - R}" y="${H - 5}" text-anchor="end" class="ch-t">${escapeHtml(shortDate(pts[n - 1].date))}</text>` : '';
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pull time trend, green band is 25 to 35 seconds">${band}${labels}${line}${dots}${x1}${x2}</svg>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pull time trend, green band is your target window">${band}${labels}${line}${dots}${x1}${x2}</svg>`;
 }
 
 let detailName = null;
@@ -1190,7 +1547,7 @@ function renderDetail(name){
     `<div class="stat"><b>${st.avg != null ? st.avg + 's' : '–'}</b><span>Avg pull</span></div>` +
     `<div class="stat"><b>${st.sweet != null ? escapeHtml(st.sweet) : '–'}</b><span>Sweet spot</span></div>`;
   detailChart.innerHTML = chartSVG(asc);
-  detailList.innerHTML = rows.map(e => histRow(e, false)).join('');
+  detailList.innerHTML = rows.map(brewRow).join('');
 }
 
 function openDetail(name){
@@ -1198,17 +1555,23 @@ function openDetail(name){
   renderDetail(name);
   go('detail');
 }
-function onHistClick(e){
-  const row = e.target.closest ? e.target.closest('.hist-row') : null;
-  if(row && row.getAttribute('data-name') && row.parentNode !== detailList) openDetail(row.getAttribute('data-name'));
+function brewRowHandler(source){
+  return (e)=>{
+    const row = e.target.closest ? e.target.closest('.hist-row') : null;
+    if(row && row.getAttribute('data-id')) openEdit(row.getAttribute('data-id'), source);
+  };
 }
-historyList.addEventListener('click', onHistClick);
-historyList.addEventListener('keydown', (e)=>{
-  if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); onHistClick(e); }
+[[historyList, 'history'], [detailList, 'detail']].forEach(([el, source])=>{
+  const fn = brewRowHandler(source);
+  el.addEventListener('click', fn);
+  el.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fn(e); }
+  });
 });
 
 function renderAll(){
   renderOptions();
+  renderChips();
   renderBeans();
   renderHistory();
   if(currentView === 'detail' && detailName) renderDetail(detailName);
@@ -1250,30 +1613,33 @@ backBtn.addEventListener('click', goBack);
 detailBackBtn.addEventListener('click', goBack);
 
 // ---------- grind recommendation ----------
-function showGrindHint(name){
+function grindAdvice(name){
   const existing = beans[name];
-  if(!existing || existing.pullTime == null){
-    grindHint.style.display = 'none';
-    return;
-  }
+  if(!existing || existing.pullTime == null) return null;
   const pt = existing.pullTime;
-  grindHint.style.display = 'flex';
-  grindHint.classList.remove('good', 'adjust');
-  // restart the entrance animation
-  grindHint.style.animation = 'none'; void grindHint.offsetWidth; grindHint.style.animation = '';
-
-  if(pt >= 25 && pt <= 35){
-    grindHint.classList.add('good');
-    grindHintArrow.textContent = '✓';
-    grindHintText.textContent = `Last pull was ${pt}s — dialed in. Same grind should work.`;
-    return;
+  if(inTarget(pt)){
+    return { cls: 'good', arrow: '✓', text: `Last pull was ${pt}s — dialed in. Same grind should work.` };
   }
-  const needFiner = pt < 25;
+  const needFiner = pt < tMin();
   const lowerIsFiner = settings.grindDirection === 'lowerFiner';
   const goLower = needFiner ? lowerIsFiner : !lowerIsFiner;
-  grindHint.classList.add('adjust');
-  grindHintArrow.textContent = goLower ? '↓' : '↑';
-  grindHintText.textContent = `Last pull was ${pt}s (${needFiner ? 'too fast' : 'too slow'}) — try ${needFiner ? 'finer' : 'coarser'}, ${goLower ? 'a lower number' : 'a higher number'}.`;
+  return {
+    cls: 'adjust',
+    arrow: goLower ? '↓' : '↑',
+    text: `Last pull was ${pt}s (${needFiner ? 'too fast' : 'too slow'}) — try ${needFiner ? 'finer' : 'coarser'}.`
+  };
+}
+function paintHint(box, arrowEl, textEl, advice){
+  if(!advice){ box.style.display = 'none'; return; }
+  box.style.display = 'flex';
+  box.classList.remove('good', 'adjust');
+  box.classList.add(advice.cls);
+  arrowEl.textContent = advice.arrow;
+  textEl.textContent = advice.text;
+  box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';   // replay the entrance
+}
+function showGrindHint(name){
+  paintHint(grindHint, grindHintArrow, grindHintText, grindAdvice(name));
 }
 
 // ---------- log a brew ----------
@@ -1294,7 +1660,28 @@ beanInput.addEventListener('input', ()=>{
     grindHint.style.display = 'none';
   }
   statusMsg.textContent = '';
+  renderChips();
 });
+
+function addBrew(o){
+  const entry = {
+    id: Date.now().toString(36),
+    name: o.name,
+    date: o.date,
+    dateDisplay: displayDate(o.date),
+    grindSize: o.grind !== '' && o.grind != null ? Number(o.grind) : null,
+    pullTime: o.time !== '' && o.time != null ? Number(o.time) : null,
+    comments: String(o.comments || '').trim(),
+    updated: Date.now()
+  };
+  logs.push(entry);
+  reconcileBean(o.name, true);          // the bean row mirrors its newest brew by date
+  beans[o.name].archived = 0;           // logging a brew also un-archives the bean
+  saveData();
+  renderAll();
+  syncNow(false);
+  return entry;
+}
 
 saveBtn.addEventListener('click', ()=>{
   const name = beanInput.value.trim();
@@ -1303,28 +1690,7 @@ saveBtn.addEventListener('click', ()=>{
     beanInput.classList.remove('shake'); void beanInput.offsetWidth; beanInput.classList.add('shake');
     return;
   }
-  const grind = grindInput.value;
-  const time = timeInput.value;
-  const entry = {
-    id: Date.now().toString(36),
-    name: name,
-    date: isoToday(),
-    dateDisplay: todayStr(),
-    grindSize: grind !== '' ? Number(grind) : null,
-    pullTime: time !== '' ? Number(time) : null,
-    comments: commentsInput.value.trim()
-  };
-  beans[name] = {                         // logging a brew also un-archives the bean
-    lastUsed: entry.date,
-    lastUsedDisplay: entry.dateDisplay,
-    grindSize: entry.grindSize,
-    pullTime: entry.pullTime,
-    comments: entry.comments,
-    updated: Date.now()
-  };
-  logs.push(entry);
-  saveData();
-  renderAll();
+  const entry = addBrew({ name, date: isoToday(), grind: grindInput.value, time: timeInput.value, comments: commentsInput.value });
 
   beanInput.value = '';
   grindInput.value = '';
@@ -1333,8 +1699,8 @@ saveBtn.addEventListener('click', ()=>{
   revealSection.classList.remove('open');
   grindHint.style.display = 'none';
   statusMsg.textContent = '';
+  renderChips();
   toast(`Logged ${name}${entry.pullTime != null ? ' · ' + entry.pullTime + 's' : ''}`);
-  syncNow(false);
 });
 
 // --- Merge (edit by edit, never whole-state overwrite) ---
@@ -1342,18 +1708,36 @@ saveBtn.addEventListener('click', ()=>{
 function normBean(b){
   return Object.assign({}, b, { updated: Number(b.updated) || Date.parse(b.lastUsed) || 0 });
 }
+function logStamp(l){
+  const u = Number(l.updated);
+  if(u) return u;
+  const t = parseInt(l.id, 36);          // older brews: the id is the time they were logged
+  return isFinite(t) ? t : 0;
+}
+function maxStamps(){
+  const out = {};
+  Array.prototype.slice.call(arguments).forEach(r=>{
+    Object.keys(r || {}).forEach(k=>{ out[k] = Math.max(Number(out[k]) || 0, Number(r[k]) || 0); });
+  });
+  return out;
+}
 function mergeStates(a, b){
   a = a || {}; b = b || {};
+  const rem = maxStamps(a.removed, b.removed);
+  const remLogs = maxStamps(a.removedLogs, b.removedLogs);
+  // brews: the newest edit of each brew wins, and a newer deletion beats an older edit
   const logMap = {};
   [].concat(a.logs || [], b.logs || []).forEach(l=>{
-    if(l && l.id && !logMap[l.id]) logMap[l.id] = l;
+    if(!l || !l.id) return;
+    const cur = logMap[l.id];
+    if(!cur || logStamp(l) > logStamp(cur)) logMap[l.id] = l;
   });
-  const rem = {};
-  [a.removed || {}, b.removed || {}].forEach(r=>{
-    Object.keys(r).forEach(n=>{
-      rem[n] = Math.max(Number(rem[n]) || 0, Number(r[n]) || 0);
-    });
+  const outLogs = [];
+  Object.keys(logMap).forEach(id=>{
+    const t = Number(remLogs[id]) || 0;
+    if(!t || logStamp(logMap[id]) > t) outLogs.push(logMap[id]);
   });
+  // beans: same rule
   const names = new Set([].concat(Object.keys(a.beans || {}), Object.keys(b.beans || {})));
   const out = {};
   names.forEach(n=>{
@@ -1363,20 +1747,280 @@ function mergeStates(a, b){
     const t = Number(rem[n]) || 0;
     if(!t || win.updated > t) out[n] = win;
   });
-  return { beans: out, logs: Object.keys(logMap).map(k => logMap[k]), removed: rem };
+  return { beans: out, logs: outLogs, removed: rem, removedLogs: remLogs };
 }
 // MERGE-END
 
 function currentState(){
-  return { beans, logs, removed };
+  return { beans, logs, removed, removedLogs };
 }
 function applyState(state){
   beans = state.beans;
   logs = state.logs;
   removed = state.removed;
+  removedLogs = state.removedLogs || {};
   saveData();
   renderAll();
 }
+
+// ---------- recent bean chips ----------
+let chipsExpanded = false;
+let chipsKey = null;
+const CHIP_LIMIT = 10;
+function renderChips(){
+  const q = beanInput.value.trim().toLowerCase();
+  let names = activeNames();
+  if(q) names = names.filter(n => n.toLowerCase().indexOf(q) !== -1 && n.toLowerCase() !== q);
+  beanInput.placeholder = activeNames().length ? 'Type or tap a bean below' : 'Type a bean name';
+  const hidden = (!chipsExpanded && names.length > CHIP_LIMIT) ? names.length - CHIP_LIMIT : 0;
+  const shown = hidden ? names.slice(0, CHIP_LIMIT) : names;
+  chipsLabel.style.display = (!q && names.length) ? '' : 'none';
+  const key = (q ? 'q' : 'a') + '|' + chipsExpanded + '|' + shown.join('\n');
+  if(key === chipsKey) return;          // nothing changed: leave the DOM alone (no flicker while typing/syncing)
+  chipsKey = key;
+  beanChips.classList.toggle('anim', !q);
+  beanChips.innerHTML = shown.map((n, i) =>
+    `<button type="button" class="chip" style="--i:${i}" data-name="${escapeHtml(n)}">${escapeHtml(n)}</button>`).join('') +
+    (hidden ? `<button type="button" class="chip more" data-more="1">+${hidden} more</button>` : '');
+}
+beanChips.addEventListener('click', (e)=>{
+  const chip = e.target.closest ? e.target.closest('.chip') : null;
+  if(!chip) return;
+  if(chip.getAttribute('data-more')){ chipsExpanded = true; chipsKey = null; renderChips(); return; }
+  beanInput.value = chip.getAttribute('data-name');
+  beanInput.dispatchEvent(new Event('input', { bubbles: true }));
+});
+
+// ---------- keeping the Beans list in step with the brews ----------
+// Each bean row mirrors its most recent brew. After an edit or delete, rebuild it from the logs.
+function reconcileBean(name, create){
+  const mine = sortedLogsDesc(logs.filter(l => l.name === name));
+  if(!mine.length){                       // no brews left for this bean
+    if(beans[name]){ removed[name] = Date.now(); delete beans[name]; }
+    return;
+  }
+  if(!beans[name] && !create) return;     // never resurrect a bean the user removed
+  const l = mine[0];
+  beans[name] = {
+    lastUsed: l.date,
+    lastUsedDisplay: l.dateDisplay,
+    grindSize: l.grindSize,
+    pullTime: l.pullTime,
+    comments: l.comments || '',
+    updated: Date.now(),
+    archived: beans[name] && beans[name].archived ? 1 : 0
+  };
+}
+function afterLogChange(){
+  saveData();
+  renderAll();
+  syncNow(false);
+  if(currentView === 'detail' && detailName && !logs.some(l => l.name === detailName)) goBack();
+}
+
+// ---------- edit / delete a past brew ----------
+let editingId = null;
+let editSource = 'history';
+
+function openEdit(id, source){
+  const e = logs.find(l => l.id === id);
+  if(!e) return;
+  editingId = id;
+  editSource = source || 'history';
+  editName.value = e.name;
+  editDate.value = parseISO(e.date) ? String(e.date).slice(0, 10) : '';
+  editGrind.value = e.grindSize ?? '';
+  editTime.value = e.pullTime ?? '';
+  editComments.value = e.comments || '';
+  editSub.textContent = e.dateDisplay || shortDate(e.date);
+  editViewBean.style.display = editSource === 'history' ? '' : 'none';
+  editBackdrop.classList.add('open');
+}
+function closeEdit(){
+  editBackdrop.classList.remove('open');
+  editingId = null;
+}
+function saveEdit(){
+  const e = logs.find(l => l.id === editingId);
+  if(!e){ closeEdit(); return; }
+  const oldName = e.name;
+  const newName = editName.value.trim();
+  if(!newName){
+    editName.classList.remove('shake'); void editName.offsetWidth; editName.classList.add('shake');
+    return;
+  }
+  const iso = editDate.value && parseISO(editDate.value) ? editDate.value : e.date;
+  const d = parseISO(iso);
+  Object.assign(e, {
+    name: newName,
+    date: iso,
+    dateDisplay: d ? d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }) : e.dateDisplay,
+    grindSize: editGrind.value !== '' ? Number(editGrind.value) : null,
+    pullTime: editTime.value !== '' ? Number(editTime.value) : null,
+    comments: editComments.value.trim(),
+    updated: Date.now()
+  });
+  reconcileBean(oldName, false);
+  if(newName !== oldName) reconcileBean(newName, true);
+  closeEdit();
+  afterLogChange();
+  toast('Brew updated');
+}
+function deleteBrew(id){
+  const e = logs.find(l => l.id === id);
+  if(!e) return;
+  const snap = Object.assign({}, e);
+  const prevBean = beans[e.name] ? Object.assign({}, beans[e.name]) : null;
+  logs = logs.filter(l => l.id !== id);
+  removedLogs[id] = Date.now();
+  reconcileBean(e.name, false);
+  closeEdit();
+  afterLogChange();
+  toast('Brew deleted', 'Undo', ()=>{
+    logs.push(Object.assign({}, snap, { updated: Date.now() }));
+    if(!beans[snap.name] && prevBean) beans[snap.name] = Object.assign({}, prevBean, { updated: Date.now() });
+    reconcileBean(snap.name, false);
+    afterLogChange();
+  });
+}
+editSaveBtn.addEventListener('click', saveEdit);
+editDeleteBtn.addEventListener('click', ()=>{ if(editingId) deleteBrew(editingId); });
+editCloseBtn.addEventListener('click', closeEdit);
+editBackdrop.addEventListener('click', (e)=>{ if(e.target === editBackdrop) closeEdit(); });
+editViewBean.addEventListener('click', ()=>{
+  const e = logs.find(l => l.id === editingId);
+  if(!e) return;
+  const name = e.name;
+  closeEdit();
+  openDetail(name);
+});
+
+// ---------- log a brew from the bean page ----------
+let logTarget = null;
+function openLogSheet(name){
+  if(!name) return;
+  logTarget = name;
+  const b = beans[name];
+  logSub.textContent = name + ' · ' + todayStr();
+  logDate.value = isoToday();
+  logGrind.value = b && b.grindSize != null ? b.grindSize : '';
+  logTime.value = b && b.pullTime != null ? b.pullTime : '';
+  logComments.value = b && b.comments ? b.comments : '';
+  paintHint(logHint, logHintArrow, logHintText, grindAdvice(name));
+  logBackdrop.classList.add('open');
+}
+function closeLogSheet(){
+  logBackdrop.classList.remove('open');
+  logTarget = null;
+}
+function saveLogSheet(){
+  const name = logTarget;
+  if(!name) return;
+  const iso = logDate.value && parseISO(logDate.value) ? logDate.value : isoToday();
+  const entry = addBrew({ name, date: iso, grind: logGrind.value, time: logTime.value, comments: logComments.value });
+  closeLogSheet();
+  toast(`Logged ${name}${entry.pullTime != null ? ' · ' + entry.pullTime + 's' : ''}`);
+}
+fabBtn.addEventListener('click', ()=> openLogSheet(detailName));
+logSaveBtn.addEventListener('click', saveLogSheet);
+logCloseBtn.addEventListener('click', closeLogSheet);
+logBackdrop.addEventListener('click', (e)=>{ if(e.target === logBackdrop) closeLogSheet(); });
+
+// ---------- swipe right to go back ----------
+function enableSwipeBack(view){
+  let sx = 0, sy = 0, lastX = 0, lastT = 0, vx = 0, dx = 0, pid = null, tracking = false, decided = false;
+  view.addEventListener('pointerdown', (e)=>{
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
+    if(editBackdrop.classList.contains('open') || logBackdrop.classList.contains('open')) return;
+    tracking = true; decided = false; pid = e.pointerId;
+    sx = lastX = e.clientX; sy = e.clientY; lastT = e.timeStamp; dx = 0; vx = 0;
+  });
+  view.addEventListener('pointermove', (e)=>{
+    if(!tracking || e.pointerId !== pid) return;
+    const mx = e.clientX - sx, my = e.clientY - sy;
+    if(!decided){
+      if(Math.abs(mx) < 10 && Math.abs(my) < 10) return;
+      if(mx <= 0 || Math.abs(my) > Math.abs(mx) * 0.8){ tracking = false; return; }   // only a rightward, mostly horizontal drag
+      decided = true;
+      try{ view.setPointerCapture(pid); }catch(_){}
+      view.style.transition = 'none';
+    }
+    dx = Math.max(0, mx);
+    view.style.transform = `translateX(${dx}px)`;
+    view.style.opacity = String(Math.max(0.35, 1 - dx / 380));
+    const dt = Math.max(1, e.timeStamp - lastT);
+    vx = (e.clientX - lastX) / dt;
+    lastX = e.clientX; lastT = e.timeStamp;
+  });
+  const end = (e)=>{
+    if(!tracking || e.pointerId !== pid) return;
+    tracking = false;
+    if(!decided) return;
+    try{ view.releasePointerCapture(pid); }catch(_){}
+    const commit = dx > 110 || (vx > 0.6 && dx > 40);
+    view.style.transition = reduceMotion ? 'none' : 'transform .22s var(--ease), opacity .22s ease';
+    if(commit){
+      view.style.transform = 'translateX(100%)';
+      view.style.opacity = '0';
+      setTimeout(()=>{
+        goBack();
+        setTimeout(()=>{ view.style.transition = ''; view.style.transform = ''; view.style.opacity = ''; }, 320);
+      }, reduceMotion ? 0 : 200);
+    }else{
+      view.style.transform = '';
+      view.style.opacity = '';
+      setTimeout(()=>{ view.style.transition = ''; }, 260);
+    }
+  };
+  view.addEventListener('pointerup', end);
+  view.addEventListener('pointercancel', end);
+}
+enableSwipeBack(detailView);
+enableSwipeBack(historyView);
+
+// ---------- settings panel (gear) ----------
+function applyTargetUI(){
+  tMinVal.textContent = tMin() + ' s';
+  tMaxVal.textContent = tMax() + ' s';
+  targetResetBtn.disabled = (tMin() === 25 && tMax() === 35);
+}
+function onTargetChanged(){
+  saveSettings();
+  applyTargetUI();
+  renderAll();
+  const name = beanInput.value.trim();
+  if(name) showGrindHint(name);
+}
+function setTarget(key, delta){
+  let lo = tMin(), hi = tMax();
+  if(key === 'targetMin') lo = Math.max(5, Math.min(lo + delta, hi - 2));
+  else hi = Math.min(120, Math.max(hi + delta, lo + 2));
+  settings.targetMin = lo;
+  settings.targetMax = hi;
+  onTargetChanged();
+}
+function openSettings(){
+  applyGrindDirUI();
+  applyTargetUI();
+  settingsBackdrop.classList.add('open');
+}
+function closeSettings(){
+  settingsBackdrop.classList.remove('open');
+}
+settingsBtn.addEventListener('click', openSettings);
+settingsCloseBtn.addEventListener('click', closeSettings);
+settingsBackdrop.addEventListener('click', (e)=>{ if(e.target === settingsBackdrop) closeSettings(); });
+settingsSheet.addEventListener('click', (e)=>{
+  const b = e.target.closest ? e.target.closest('.stepper button') : null;
+  if(!b) return;
+  setTarget(b.parentNode.getAttribute('data-key'), Number(b.getAttribute('data-d')));
+});
+targetResetBtn.addEventListener('click', ()=>{
+  settings.targetMin = 25;
+  settings.targetMax = 35;
+  onTargetChanged();
+});
+
 
 loadData();
 
@@ -1489,7 +2133,7 @@ backupBtn.addEventListener('click', ()=>{
     app: 'Beanly',
     version: APP_VERSION,
     exported: new Date().toISOString(),
-    beans, logs, removed
+    beans, logs, removed, removedLogs
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
   const url = URL.createObjectURL(blob);
@@ -1514,7 +2158,8 @@ restoreFile.addEventListener('change', async ()=>{
     applyState(mergeStates(currentState(), {
       beans: data.beans || {},
       logs: data.logs || [],
-      removed: data.removed || {}
+      removed: data.removed || {},
+      removedLogs: data.removedLogs || {}
     }));
     setDataStatus(`Restored — ${logs.length - before} new brews added.`);
     syncNow(false);
@@ -1581,6 +2226,9 @@ document.addEventListener('visibilitychange', ()=>{
 });
 
 loadSettings();
+applyTargetUI();
+applyGrindDirUI();
+renderAll();
 if(settings.sheetUrl) syncNow(false);
 
 // --- PWA install prompt (Android/Chrome) ---
