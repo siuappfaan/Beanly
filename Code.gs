@@ -1,4 +1,4 @@
-// Beanly — Google Sheet sync backend (v1.2.0)
+// Beanly — Google Sheet sync backend (v1.3.0: adds the Archived column)
 //
 // Setup (first time):
 // 1. Create a new Google Sheet, then Extensions > Apps Script.
@@ -13,7 +13,7 @@
 // The "Beans", "Logs" and "Removed" tabs are created automatically.
 
 var HEADERS = {
-  Beans:   ['Bean', 'LastUsed', 'LastUsedDisplay', 'GrindSize', 'PullTime', 'Comments', 'Updated'],
+  Beans:   ['Bean', 'LastUsed', 'LastUsedDisplay', 'GrindSize', 'PullTime', 'Comments', 'Updated', 'Archived'],
   Logs:    ['Id', 'Name', 'Date', 'DateDisplay', 'GrindSize', 'PullTime', 'Comments'],
   Removed: ['Bean', 'Timestamp']
 };
@@ -50,7 +50,8 @@ function readState_() {
       grindSize: orNull_(r[3]),
       pullTime: orNull_(r[4]),
       comments: r[5] === null || r[5] === undefined ? '' : String(r[5]),
-      updated: Number(r[6]) || 0
+      updated: Number(r[6]) || 0,
+      archived: Number(r[7]) ? 1 : 0
     };
   }
 
@@ -95,7 +96,7 @@ function writeState_(state) {
     return [n, x.lastUsed, x.lastUsedDisplay,
       x.grindSize === null ? '' : x.grindSize,
       x.pullTime === null ? '' : x.pullTime,
-      x.comments || '', x.updated || 0];
+      x.comments || '', x.updated || 0, x.archived ? 1 : 0];
   });
   var logRows = state.logs.map(function (e) {
     return [e.id, e.name, e.date, e.dateDisplay,

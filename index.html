@@ -20,54 +20,60 @@
     --roast:#7A4E2D;
     --roast-dark:#5E3A20;
     --heading:#5E3A20;
-    --muted:#5a4636;
+    --muted:#6B5444;
     --latte:#C9AE8C;
     --oat:#EDE3D3;
     --card:#FBF6EC;
     --row-alt:#F4ECDE;
-    --line:#DCC9AC;
+    --line:#E2D2B8;
     --input-bg:#ffffff;
     --pull-good:#2E7D32;
     --pull-bad:#B3261E;
+    --danger:#B3261E;
+    --ease:cubic-bezier(.2,.8,.2,1);
   }
   :root[data-theme="dark"]{
     --espresso:#F0E6D8;
     --roast:#C08552;
     --roast-dark:#9C6B3F;
     --heading:#E0B98A;
-    --muted:#C9AE8C;
+    --muted:#B9A48D;
     --latte:#8A6B4C;
     --oat:#1E140D;
     --card:#2A1D14;
     --row-alt:#251A12;
-    --line:#4A3726;
+    --line:#43321F;
     --input-bg:#332416;
     --pull-good:#7CD47F;
     --pull-bad:#FF8A80;
+    --danger:#C0392B;
   }
-  *{box-sizing:border-box;}
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html{ -webkit-text-size-adjust:100%; }
   body{
     margin:0;
     background:var(--oat);
     color:var(--espresso);
     font-family:'Source Sans 3', sans-serif;
     min-height:100vh;
-    padding:32px 16px 64px;
-    transition:background .2s ease, color .2s ease;
+    padding:calc(26px + env(safe-area-inset-top, 0px)) 16px calc(72px + env(safe-area-inset-bottom, 0px));
+    transition:background .25s ease, color .25s ease;
   }
-  .wrap{
-    max-width:600px;
-    margin:0 auto;
-  }
-  header{
+  button{ font-family:inherit; }
+  button:active:not(:disabled){ transform:scale(.97); }
+  .wrap{ max-width:600px; margin:0 auto; }
+
+  /* ---------- header ---------- */
+  .top-row{
     display:flex;
     align-items:center;
+    justify-content:space-between;
     gap:12px;
-    margin-bottom:0;
+    margin-bottom:22px;
   }
+  header{ display:flex; align-items:center; gap:12px; }
   .brand-logo{
-    width:34px;
-    height:34px;
+    width:34px; height:34px;
     border-radius:50%;
     object-fit:cover;
     flex-shrink:0;
@@ -81,86 +87,122 @@
     margin:0;
     letter-spacing:-0.01em;
   }
+  .history-btn{
+    background:none;
+    border:none;
+    color:var(--heading);
+    opacity:.6;
+    font-size:.82rem;
+    cursor:pointer;
+    padding:8px 4px;
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  .history-btn:hover{ opacity:1; }
+  body[data-view="history"] .history-btn,
+  body[data-view="detail"] .history-btn{ visibility:hidden; }
+
+  /* ---------- views + transitions ---------- */
+  .view{ display:none; }
+  .view.active{ display:block; animation:viewIn .28s var(--ease) both; }
+  .view.active.back{ animation-name:viewInBack; }
+  @keyframes viewIn{ from{opacity:0; transform:translateX(18px)} to{opacity:1; transform:none} }
+  @keyframes viewInBack{ from{opacity:0; transform:translateX(-18px)} to{opacity:1; transform:none} }
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:2px;
+    background:none;
+    border:none;
+    color:var(--roast);
+    font-size:.88rem;
+    font-weight:600;
+    cursor:pointer;
+    padding:4px 8px 4px 0;
+    margin-bottom:10px;
+  }
+  .back-btn svg{ width:18px; height:18px; }
+  svg.ic{ fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .page-title{
+    font-family:'Fraunces', serif;
+    font-size:1.4rem;
+    font-weight:600;
+    margin:0 2px 12px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  .count{
+    font-family:'Source Sans 3', sans-serif;
+    font-size:.74rem;
+    font-weight:600;
+    color:var(--muted);
+  }
+
+  /* ---------- cards + form ---------- */
   .card{
     background:var(--card);
     border:1px solid var(--line);
-    border-radius:10px;
-    padding:22px 22px 20px;
-    margin-bottom:22px;
-    transition:background .2s ease, border-color .2s ease;
+    border-radius:14px;
+    padding:20px 18px 18px;
+    margin-bottom:18px;
+    transition:background .25s ease, border-color .25s ease;
   }
   .card h2{
     font-family:'Fraunces', serif;
-    font-size:1.05rem;
+    font-size:1.08rem;
     font-weight:500;
-    margin:0 0 16px;
+    margin:0 0 14px;
     color:var(--heading);
+    display:flex;
+    align-items:baseline;
+    gap:8px;
   }
-  label{
-    display:block;
-    font-size:0.82rem;
-    font-weight:600;
-    color:var(--heading);
-    margin-bottom:5px;
-  }
+  .card.flush{ padding:2px 18px 6px; }
+  label{ display:block; font-size:.8rem; font-weight:600; color:var(--heading); margin-bottom:5px; }
   input[type=text], input[type=number]{
     width:100%;
     font-family:inherit;
-    font-size:0.98rem;
-    padding:10px 12px;
+    font-size:1rem;
+    padding:11px 12px;
     border:1px solid var(--line);
-    border-radius:7px;
+    border-radius:10px;
     background:var(--input-bg);
     color:var(--espresso);
     outline:none;
-    transition:border-color .15s ease, background .2s ease;
+    transition:border-color .15s ease, box-shadow .15s ease, background .25s ease;
   }
   input[type=text]:focus, input[type=number]:focus{
     border-color:var(--roast);
+    box-shadow:0 0 0 3px color-mix(in srgb, var(--roast) 22%, transparent);
   }
+  input::placeholder{ color:var(--muted); opacity:.65; }
   .field{ margin-bottom:14px; }
-  .row2{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px;
-  }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .shake{ animation:shake .32s ease; }
+  @keyframes shake{ 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
   .date-line{
-    font-size:0.88rem;
-    color:var(--espresso);
-    background:var(--row-alt);
-    border:1px solid var(--line);
-    border-radius:7px;
-    padding:9px 12px;
-    margin-bottom:14px;
+    font-size:.84rem;
+    color:var(--muted);
+    margin:0 0 12px;
   }
-  .date-line b{ color:var(--heading); }
-  .reveal{
-    max-height:0;
-    overflow:hidden;
-    opacity:0;
-    transition:max-height .25s ease, opacity .25s ease;
-  }
-  .reveal.open{
-    max-height:700px;
-    opacity:1;
-  }
+  .date-line b{ color:var(--heading); font-weight:600; }
+  .reveal{ max-height:0; overflow:hidden; opacity:0; margin:0 -5px; padding:0 5px; transition:max-height .32s var(--ease), opacity .25s ease; }
+  .reveal.open{ max-height:700px; opacity:1; }
   .grind-hint{
     display:flex;
     align-items:center;
-    gap:8px;
-    font-size:0.85rem;
+    gap:9px;
+    font-size:.84rem;
     color:var(--heading);
     background:var(--row-alt);
     border:1px solid var(--line);
-    border-radius:7px;
+    border-radius:10px;
     padding:9px 12px;
     margin-bottom:14px;
+    animation:hintIn .3s var(--ease) both;
   }
-  .grind-hint .arrow{
-    font-size:1.05rem;
-    font-weight:700;
-    line-height:1;
-  }
+  @keyframes hintIn{ from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none} }
+  .grind-hint .arrow{ font-size:1.1rem; font-weight:700; line-height:1; }
   .grind-hint.good .arrow{ color:var(--pull-good); }
   .grind-hint.adjust .arrow{ color:var(--roast); }
   button.primary{
@@ -168,111 +210,213 @@
     background:var(--roast);
     color:#fff;
     border:none;
-    font-family:inherit;
-    font-size:0.98rem;
+    font-size:1rem;
     font-weight:600;
-    padding:12px;
-    border-radius:7px;
+    padding:13px;
+    border-radius:10px;
     cursor:pointer;
-    margin-top:4px;
-    transition:background .15s ease;
+    margin-top:2px;
+    transition:background .15s ease, transform .1s ease;
   }
   button.primary:hover{ background:var(--roast-dark); }
-  button.primary:disabled{
-    background:var(--latte);
-    cursor:not-allowed;
-  }
-  .status{
-    font-size:0.85rem;
-    margin-top:10px;
-    min-height:18px;
-    color:var(--heading);
-  }
-  table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:0.9rem;
-  }
-  th, td{
-    text-align:left;
-    padding:10px 8px;
-    border-bottom:1px solid var(--line);
-  }
-  th{
-    font-size:0.72rem;
-    text-transform:uppercase;
-    letter-spacing:0.04em;
-    color:var(--heading);
-    font-weight:600;
-  }
-  tbody tr:nth-child(odd){ background:var(--row-alt); }
-  td.bean-name{ font-weight:600; }
-  td.comments{ color:var(--muted); }
-  .del-btn{
-    background:none;
-    border:none;
-    color:var(--roast);
-    cursor:pointer;
-    font-size:0.85rem;
-    padding:2px 6px;
-    opacity:0.6;
-  }
-  .del-btn:hover{ opacity:1; }
-  .empty{
-    text-align:center;
-    padding:28px 10px;
-    color:var(--heading);
-    opacity:0.7;
-    font-size:0.9rem;
-  }
-  .table-scroll{
-    overflow-x:auto;
-  }
-  .top-row{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom:28px;
-  }
-  .history-btn{
-    background:none;
-    border:none;
-    color:var(--heading);
-    opacity:0.55;
-    font-size:0.8rem;
-    font-family:inherit;
-    cursor:pointer;
-    padding:6px 4px;
-    text-decoration:underline;
-    text-decoration-color:transparent;
-    transition:opacity .15s ease, text-decoration-color .15s ease;
-    white-space:nowrap;
-    margin-top:6px;
-  }
-  .history-btn:hover{
-    opacity:0.9;
-    text-decoration-color:var(--heading);
-  }
-  .view{ display:none; }
-  .view.active{ display:block; }
-  .back-btn{
-    background:none;
-    border:none;
-    color:var(--roast);
-    font-family:inherit;
-    font-size:0.88rem;
-    font-weight:600;
-    cursor:pointer;
-    padding:0 0 18px;
-  }
+  .status{ font-size:.84rem; min-height:18px; margin-top:8px; color:var(--pull-bad); }
+  .empty{ text-align:center; padding:26px 12px; color:var(--muted); font-size:.9rem; }
   .pull-good{ color:var(--pull-good); font-weight:600; }
   .pull-bad{ color:var(--pull-bad); font-weight:600; }
-  .history-row-date{
-    font-size:0.78rem;
-    color:var(--heading);
-    opacity:0.75;
+
+  /* ---------- beans list (swipe rows) ---------- */
+  .card.list-card{ padding:18px 0 0; overflow:hidden; }
+  .list-card h2{ padding:0 18px; margin-bottom:10px; }
+  .beans-head, .row-content{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 46px 52px;
+    gap:8px;
+    align-items:center;
+    padding-left:18px;
+    padding-right:18px;
   }
+  .beans-head{
+    padding-bottom:7px;
+    border-bottom:1px solid var(--line);
+    font-size:.64rem;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    font-weight:700;
+    color:var(--heading);
+    opacity:.85;
+  }
+  .beans-head span:nth-child(n+2){ text-align:right; }
+  .bean-row{ position:relative; overflow:hidden; background:var(--card); }
+  .bean-row + .bean-row{ border-top:1px solid var(--line); }
+  .bean-row.enter{ animation:rowIn .36s var(--ease) both; animation-delay:calc(var(--i, 0) * 35ms); }
+  @keyframes rowIn{ from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
+  .bean-row.leaving{
+    height:0 !important;
+    opacity:0;
+    border-top-width:0;
+    transition:height .26s var(--ease), opacity .2s ease;
+  }
+  .row-actions{
+    position:absolute;
+    top:0; right:0; bottom:0;
+    width:120px;
+    display:flex;
+    opacity:0;
+    transition:opacity .2s ease;
+  }
+  .bean-row.open .row-actions, .bean-row.swiping .row-actions{ opacity:1; }
+  .act{
+    flex:1;
+    border:none;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    font-size:.62rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    cursor:pointer;
+  }
+  .act svg{ width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .act-archive{ background:var(--roast); }
+  .act-remove{ background:var(--danger); }
+  .row-content{
+    position:relative;
+    background:var(--card);
+    padding-top:11px;
+    padding-bottom:11px;
+    touch-action:pan-y;
+    cursor:pointer;
+    user-select:none;
+    -webkit-user-select:none;
+    outline:none;
+    transition:transform .26s var(--ease), background .15s ease;
+    will-change:transform;
+  }
+  .bean-row.open .row-content{ transform:translateX(-120px); }
+  .row-content:active{ background:var(--row-alt); }
+  .row-content:focus-visible{ background:var(--row-alt); }
+  .row-content.nudge{ animation:nudge 1s var(--ease) both; }
+  @keyframes nudge{ 0%{transform:none} 35%{transform:translateX(-52px)} 70%{transform:translateX(-52px)} 100%{transform:none} }
+  .b-name{
+    font-weight:600;
+    font-size:.95rem;
+    line-height:1.25;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .b-meta{
+    font-size:.74rem;
+    color:var(--muted);
+    margin-top:2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .b-num{ text-align:right; font-variant-numeric:tabular-nums; font-size:.92rem; }
+  .arch-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    background:none;
+    border:none;
+    border-top:1px solid var(--line);
+    padding:13px 18px;
+    font-size:.8rem;
+    font-weight:600;
+    color:var(--heading);
+    cursor:pointer;
+  }
+  .arch-toggle:active:not(:disabled){ transform:none; background:var(--row-alt); }
+  .arch-toggle .chev{ width:16px; height:16px; transition:transform .3s var(--ease); }
+  .arch-toggle[aria-expanded="true"] .chev{ transform:rotate(180deg); }
+  .arch-wrap{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .32s var(--ease); }
+  .arch-wrap.open{ grid-template-rows:1fr; }
+  .arch-inner{ overflow:hidden; min-height:0; }
+  .arch-wrap .b-name, .arch-wrap .b-num{ opacity:.7; }
+  .list-card > .empty + .arch-toggle, .list-card > .arch-toggle:first-of-type{ border-top:1px solid var(--line); }
+
+  /* ---------- history + detail rows ---------- */
+  .hist-month{
+    font-size:.64rem;
+    text-transform:uppercase;
+    letter-spacing:.09em;
+    font-weight:700;
+    color:var(--heading);
+    opacity:.85;
+    padding:14px 0 5px;
+  }
+  .hist-row{
+    display:grid;
+    grid-template-columns:36px minmax(0,1fr) auto;
+    gap:12px;
+    align-items:center;
+    padding:9px 0;
+    border-top:1px solid var(--line);
+    cursor:pointer;
+    border-radius:6px;
+    transition:background .15s ease;
+  }
+  .hist-month + .hist-row{ border-top:none; }
+  .hist-row.static{ cursor:default; }
+  .hist-row.static:active{ background:none; }
+  .hist-row:active{ background:var(--row-alt); }
+  .hist-row:focus-visible{ outline:2px solid var(--roast); outline-offset:-2px; }
+  .hist-date{ text-align:center; line-height:1.05; }
+  .hist-date b{ display:block; font-size:1.08rem; font-weight:600; font-variant-numeric:tabular-nums; }
+  .hist-date span{ font-size:.58rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); }
+  .hist-name{ font-weight:600; font-size:.92rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hist-note{ font-size:.74rem; color:var(--muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hist-right{ text-align:right; font-variant-numeric:tabular-nums; }
+  .hist-pull{ font-size:.96rem; }
+  .hist-grind{ font-size:.7rem; color:var(--muted); margin-top:1px; }
+
+  .detail-name{ font-family:'Fraunces', serif; font-size:1.3rem; font-weight:600; line-height:1.2; }
+  .detail-sub{ font-size:.78rem; color:var(--muted); margin-top:3px; }
+  .stat-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0 8px; }
+  .stat{ background:var(--row-alt); border:1px solid var(--line); border-radius:10px; padding:8px 10px; }
+  .stat b{ display:block; font-size:1.05rem; font-weight:600; font-variant-numeric:tabular-nums; }
+  .stat span{ font-size:.6rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .chart{ width:100%; height:auto; display:block; margin-top:4px; }
+  .ch-t{ font-size:9px; fill:var(--muted); font-family:'Source Sans 3', sans-serif; }
+  .ch-line{ stroke:var(--roast); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; animation:draw .8s var(--ease) .1s forwards; }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+  .ch-dot{ stroke:var(--card); stroke-width:1.5; opacity:0; transform-box:fill-box; transform-origin:center; animation:dotIn .3s var(--ease) forwards; }
+  .ch-dot.g{ fill:var(--pull-good); }
+  .ch-dot.b{ fill:var(--pull-bad); }
+  @keyframes dotIn{ from{opacity:0; transform:scale(.4)} to{opacity:1; transform:scale(1)} }
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+    transform:translate(-50%, 24px);
+    opacity:0;
+    pointer-events:none;
+    background:var(--espresso);
+    color:var(--card);
+    padding:9px 8px 9px 16px;
+    border-radius:12px;
+    font-size:.86rem;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:max-content;
+    max-width:calc(100% - 32px);
+    box-shadow:0 8px 24px rgba(0,0,0,.3);
+    transition:transform .3s var(--ease), opacity .22s ease;
+    z-index:120;
+  }
+  .toast.show{ transform:translate(-50%, 0); opacity:1; pointer-events:auto; }
+  .toast span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .toast button{ background:none; border:none; color:var(--latte); font-size:.84rem; font-weight:700; cursor:pointer; padding:6px 8px; border-radius:8px; }
+
   .install-banner{
     display:none;
     align-items:center;
@@ -280,46 +424,33 @@
     gap:12px;
     background:var(--roast);
     color:#fff;
-    border-radius:9px;
+    border-radius:12px;
     padding:12px 14px;
-    margin-bottom:20px;
-    font-size:0.88rem;
+    margin-bottom:18px;
+    font-size:.88rem;
   }
-  .install-banner button{
-    background:#fff;
-    color:#5E3A20;
-    border:none;
-    border-radius:6px;
-    padding:7px 12px;
-    font-weight:600;
-    font-size:0.85rem;
-    cursor:pointer;
-    white-space:nowrap;
-  }
-  .version-footer{
-    text-align:center;
-    margin-top:8px;
-  }
+  .install-banner button{ background:#fff; color:#5E3A20; border:none; border-radius:8px; padding:7px 12px; font-weight:600; font-size:.85rem; cursor:pointer; white-space:nowrap; }
+  .version-footer{ text-align:center; margin-top:6px; }
   .version-footer button{
     background:none;
     border:none;
     color:var(--heading);
-    opacity:0.4;
-    font-family:inherit;
-    font-size:0.75rem;
+    opacity:.4;
+    font-size:.75rem;
     cursor:pointer;
     padding:8px;
     user-select:none;
     -webkit-user-select:none;
-  }
-  .version-footer button:hover{ opacity:0.75; }
-
-  .version-footer button{
     -webkit-touch-callout:none;
     touch-action:manipulation;
     transition:opacity .2s ease;
   }
-  .version-footer button.holding{ opacity:0.85; }
+  .version-footer button:hover{ opacity:.75; }
+  .version-footer button.holding{ opacity:.85; }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ animation-duration:.01ms !important; animation-delay:0ms !important; transition-duration:.01ms !important; }
+  }
 
   /* "What's new" panel (compact, shared design across apps) */
   .modal-backdrop{
@@ -469,14 +600,12 @@
   .m-note{ font-size:0.7rem; color:var(--muted); min-height:12px; margin-top:2px; }
 </style>
 </head>
-<body>
+<body data-view="main">
 <div class="wrap">
   <div class="top-row">
     <header>
       <img src="icon-192.png" alt="Beanly logo" class="brand-logo">
-      <div>
-        <h1>Beanly</h1>
-      </div>
+      <h1>Beanly</h1>
     </header>
     <button class="history-btn" id="historyToggleBtn">History</button>
   </div>
@@ -491,7 +620,7 @@
       <h2>Log a brew</h2>
       <div class="field">
         <label for="beanInput">Bean</label>
-        <input type="text" id="beanInput" list="beanOptions" placeholder="Type or pick a bean name" autocomplete="off">
+        <input type="text" id="beanInput" list="beanOptions" placeholder="Type or pick a bean name" autocomplete="off" enterkeyhint="next">
         <datalist id="beanOptions"></datalist>
       </div>
 
@@ -504,69 +633,64 @@
         <div class="row2">
           <div class="field">
             <label for="grindInput">Grind size</label>
-            <input type="number" id="grindInput" placeholder="e.g. 18" step="0.1">
+            <input type="number" id="grindInput" placeholder="e.g. 18" step="0.1" inputmode="decimal">
           </div>
           <div class="field">
             <label for="timeInput">Pull time (sec)</label>
-            <input type="number" id="timeInput" placeholder="e.g. 28" step="1">
+            <input type="number" id="timeInput" placeholder="e.g. 28" step="1" inputmode="numeric">
           </div>
         </div>
         <div class="field">
           <label for="commentsInput">Comments</label>
-          <input type="text" id="commentsInput" placeholder="Optional notes — sour, fast pour, etc.">
+          <input type="text" id="commentsInput" placeholder="Optional notes — sour, fast pour, etc." enterkeyhint="done">
         </div>
         <button class="primary" id="saveBtn">Log brew</button>
         <div class="status" id="statusMsg"></div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Beans</h2>
-      <div class="table-scroll">
-        <table id="beanTable">
-          <thead>
-            <tr>
-              <th>Bean</th>
-              <th>Last used</th>
-              <th>Grind</th>
-              <th>Pull time</th>
-              <th>Comments</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-        <div class="empty" id="emptyMsg" style="display:none;">No beans logged yet — add your first one above.</div>
-      </div>
+    <div class="card list-card">
+      <h2>Beans <span class="count" id="beanCount"></span></h2>
+      <div class="beans-head"><span>Bean</span><span>Grind</span><span>Pull</span></div>
+      <div id="beanList"></div>
+      <div class="empty" id="emptyMsg" style="display:none;"></div>
+      <button class="arch-toggle" id="archToggle" aria-expanded="false" style="display:none;">
+        <span>Archived <span class="count" id="archCount"></span></span>
+        <svg class="ic chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="arch-wrap" id="archWrap"><div class="arch-inner"><div id="archList"></div></div></div>
     </div>
 
     <div class="version-footer">
-      <button id="versionBtn">v1.2.0</button>
+      <button id="versionBtn">v1.3.0</button>
     </div>
   </div>
 
   <div class="view" id="historyView">
-    <button class="back-btn" id="backBtn">← Back</button>
+    <button class="back-btn" id="backBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back</button>
+    <div class="page-title">History <span class="count" id="histCount"></span></div>
+    <div class="card flush">
+      <div id="historyList"></div>
+      <div class="empty" id="historyEmptyMsg" style="display:none;">No brews logged yet.</div>
+    </div>
+  </div>
+
+  <div class="view" id="detailView">
+    <button class="back-btn" id="detailBackBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back</button>
     <div class="card">
-      <h2>Full history</h2>
-      <div class="table-scroll">
-        <table id="historyTable">
-          <thead>
-            <tr>
-              <th>Bean</th>
-              <th>Date</th>
-              <th>Grind</th>
-              <th>Pull time</th>
-              <th>Comments</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
-        <div class="empty" id="historyEmptyMsg" style="display:none;">No brews logged yet.</div>
-      </div>
+      <div class="detail-name" id="detailName"></div>
+      <div class="detail-sub" id="detailSub"></div>
+      <div class="stat-row" id="detailStats"></div>
+      <div id="detailChart"></div>
+    </div>
+    <div class="card flush">
+      <div class="hist-month">All brews</div>
+      <div id="detailList"></div>
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg"></span><button id="toastBtn">Undo</button></div>
 
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal-sheet" id="modalSheet">
@@ -611,8 +735,19 @@
 </div>
 
 <script>
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.0';
 const CHANGELOG = [
+  {
+    version: '1.3.0',
+    date: '2 Nov 2026',
+    items: [
+      'Tap a bean to see all its brews, a pull-time trend and its sweet-spot grind',
+      'Swipe a bean left to archive or remove it, with Undo. Archived beans tuck away below the list',
+      'Bean list now fits the screen with no sideways scrolling',
+      'Cleaner History page, grouped by month',
+      'Smoother page transitions, and Back works with your phone’s back gesture'
+    ]
+  },
   {
     version: '1.2.0',
     date: '2 Nov 2026',
@@ -654,35 +789,83 @@ const SETTINGS_KEY = 'beanly-settings';
 let beans = {};
 let logs = [];
 let removed = {};
-let settings = { theme: null, grindDirection: 'lowerFiner', sheetUrl: '' };
+let settings = { theme: null, grindDirection: 'lowerFiner', sheetUrl: '', swipeHint: false };
 
-const beanInput = document.getElementById('beanInput');
-const beanOptions = document.getElementById('beanOptions');
-const revealSection = document.getElementById('revealSection');
-const todayLabel = document.getElementById('todayLabel');
-const grindInput = document.getElementById('grindInput');
-const timeInput = document.getElementById('timeInput');
-const commentsInput = document.getElementById('commentsInput');
-const saveBtn = document.getElementById('saveBtn');
-const statusMsg = document.getElementById('statusMsg');
-const tableBody = document.getElementById('tableBody');
-const emptyMsg = document.getElementById('emptyMsg');
-const historyToggleBtn = document.getElementById('historyToggleBtn');
-const backBtn = document.getElementById('backBtn');
-const mainView = document.getElementById('mainView');
-const historyView = document.getElementById('historyView');
-const historyBody = document.getElementById('historyBody');
-const historyEmptyMsg = document.getElementById('historyEmptyMsg');
-const grindHint = document.getElementById('grindHint');
-const grindHintArrow = document.getElementById('grindHintArrow');
-const grindHintText = document.getElementById('grindHintText');
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const ACTION_W = 60;
+const OPEN_X = -(ACTION_W * 2);
 
+const $ = (id) => document.getElementById(id);
+const beanInput = $('beanInput');
+const beanOptions = $('beanOptions');
+const revealSection = $('revealSection');
+const todayLabel = $('todayLabel');
+const grindInput = $('grindInput');
+const timeInput = $('timeInput');
+const commentsInput = $('commentsInput');
+const saveBtn = $('saveBtn');
+const statusMsg = $('statusMsg');
+const historyToggleBtn = $('historyToggleBtn');
+const backBtn = $('backBtn');
+const detailBackBtn = $('detailBackBtn');
+const mainView = $('mainView');
+const historyView = $('historyView');
+const detailView = $('detailView');
+const beanList = $('beanList');
+const archList = $('archList');
+const archToggle = $('archToggle');
+const archWrap = $('archWrap');
+const archCount = $('archCount');
+const beanCount = $('beanCount');
+const emptyMsg = $('emptyMsg');
+const historyList = $('historyList');
+const historyEmptyMsg = $('historyEmptyMsg');
+const histCount = $('histCount');
+const detailNameEl = $('detailName');
+const detailSub = $('detailSub');
+const detailStats = $('detailStats');
+const detailChart = $('detailChart');
+const detailList = $('detailList');
+const grindHint = $('grindHint');
+const grindHintArrow = $('grindHintArrow');
+const grindHintText = $('grindHintText');
+const toastEl = $('toast');
+const toastMsg = $('toastMsg');
+const toastBtn = $('toastBtn');
+
+const ICONS = {
+  archive: '<svg viewBox="0 0 24 24"><path d="M3.5 4.5h17v4h-17z"/><path d="M5 8.5V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8.5"/><path d="M10 12.5h4"/></svg>',
+  unarchive: '<svg viewBox="0 0 24 24"><path d="M3.5 4.5h17v4h-17z"/><path d="M5 8.5V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8.5"/><path d="M12 17v-5.5M9.5 14 12 11.5 14.5 14"/></svg>',
+  trash: '<svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9.5 7V4.5h5V7"/><path d="M6 7l.9 12a1 1 0 0 0 1 .9h8.2a1 1 0 0 0 1-.9L18 7"/><path d="M10 11v5M14 11v5"/></svg>'
+};
+
+// ---------- helpers ----------
+function escapeHtml(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 function todayStr(){
-  const d = new Date();
-  return d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+  return new Date().toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
 }
 function isoToday(){
   return new Date().toISOString().slice(0,10);
+}
+function parseISO(d){
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || '');
+  return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+}
+function shortDate(iso, fallback){
+  const d = parseISO(iso);
+  if(!d) return fallback || '';
+  const sameYear = d.getFullYear() === new Date().getFullYear();
+  return d.toLocaleDateString(undefined, sameYear
+    ? { day:'numeric', month:'short' }
+    : { day:'numeric', month:'short', year:'2-digit' });
+}
+function monthLabel(iso){
+  const d = parseISO(iso);
+  return d ? d.toLocaleDateString(undefined, { month:'long', year:'numeric' }) : 'Earlier';
 }
 function readJSON(key, fallback){
   try{
@@ -692,16 +875,31 @@ function readJSON(key, fallback){
     return fallback;
   }
 }
+function pullTimeClass(pt){
+  if(pt == null || pt === '') return '';
+  return (pt >= 25 && pt <= 35) ? 'pull-good' : 'pull-bad';
+}
+function sortedLogsDesc(list){
+  return [...list].sort((a,b)=> ((b.date||'') + b.id).localeCompare((a.date||'') + a.id));
+}
+function activeNames(){
+  return Object.keys(beans).filter(n => !beans[n].archived).sort(byRecent);
+}
+function archivedNames(){
+  return Object.keys(beans).filter(n => beans[n].archived).sort(byRecent);
+}
+function byRecent(a, b){
+  return ((beans[b].lastUsed||'').localeCompare(beans[a].lastUsed||'')) ||
+         ((Number(beans[b].updated)||0) - (Number(beans[a].updated)||0));
+}
 
+// ---------- data ----------
 function loadData(){
   beans = readJSON(STORAGE_KEY, {});
   logs = readJSON(HISTORY_KEY, []);
   removed = readJSON(REMOVED_KEY, {});
-  renderOptions();
-  renderTable();
-  renderHistory();
+  renderAll();
 }
-
 function saveData(){
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify(beans));
@@ -712,78 +910,346 @@ function saveData(){
   }
 }
 
-function pullTimeClass(pullTime){
-  if(pullTime == null || pullTime === '') return '';
-  return (pullTime >= 25 && pullTime <= 35) ? 'pull-good' : 'pull-bad';
+// ---------- toast ----------
+let toastTimer = null;
+function hideToast(){
+  toastEl.classList.remove('show');
+}
+function toast(msg, actionLabel, actionFn){
+  toastMsg.textContent = msg;
+  if(actionLabel){
+    toastBtn.style.display = '';
+    toastBtn.textContent = actionLabel;
+    toastBtn.onclick = ()=>{ hideToast(); if(actionFn) actionFn(); };
+  }else{
+    toastBtn.style.display = 'none';
+    toastBtn.onclick = null;
+  }
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, actionLabel ? 5000 : 2600);
+}
+
+// ---------- render: beans list ----------
+let renderedActive = null;
+let openRow = null;
+
+function beanRowHTML(name, b, archived, i, isNew){
+  const n = escapeHtml(name);
+  const date = shortDate(b.lastUsed, b.lastUsedDisplay);
+  const meta = escapeHtml(date + (b.comments ? ' · ' + b.comments : ''));
+  const pull = b.pullTime != null ? b.pullTime + 's' : '–';
+  const grind = b.grindSize != null ? b.grindSize : '–';
+  const archLabel = archived ? 'Restore' : 'Archive';
+  return `<div class="bean-row${isNew ? ' enter' : ''}" data-name="${n}" style="--i:${Math.min(i, 8)}">
+    <div class="row-actions">
+      <button class="act act-archive" data-act="${archived ? 'unarchive' : 'archive'}" aria-label="${archLabel} ${n}">${archived ? ICONS.unarchive : ICONS.archive}<span>${archLabel}</span></button>
+      <button class="act act-remove" data-act="remove" aria-label="Remove ${n}">${ICONS.trash}<span>Remove</span></button>
+    </div>
+    <div class="row-content" role="button" tabindex="0">
+      <div class="b-main"><div class="b-name">${n}</div><div class="b-meta">${meta}</div></div>
+      <div class="b-num">${grind}</div>
+      <div class="b-num ${pullTimeClass(b.pullTime)}">${pull}</div>
+    </div>
+  </div>`;
+}
+
+function renderBeans(){
+  const act = activeNames();
+  const arch = archivedNames();
+  beanCount.textContent = act.length ? String(act.length) : '';
+  beanList.innerHTML = act.map((n, i) => beanRowHTML(n, beans[n], false, i, renderedActive === null || !renderedActive.has(n))).join('');
+  archList.innerHTML = arch.map((n, i) => beanRowHTML(n, beans[n], true, i, false)).join('');
+  renderedActive = new Set(act);
+
+  if(!act.length){
+    emptyMsg.style.display = 'block';
+    emptyMsg.textContent = arch.length ? 'All your beans are archived.' : 'No beans yet — log your first brew above.';
+  }else{
+    emptyMsg.style.display = 'none';
+  }
+  archToggle.style.display = arch.length ? '' : 'none';
+  archCount.textContent = arch.length ? String(arch.length) : '';
+  if(!arch.length){
+    archWrap.classList.remove('open');
+    archToggle.setAttribute('aria-expanded', 'false');
+  }
+  openRow = null;
+  beanList.querySelectorAll('.bean-row').forEach(attachSwipe);
+  archList.querySelectorAll('.bean-row').forEach(attachSwipe);
 }
 
 function renderOptions(){
-  beanOptions.innerHTML = '';
-  Object.keys(beans).forEach(name=>{
-    const opt = document.createElement('option');
-    opt.value = name;
-    beanOptions.appendChild(opt);
+  beanOptions.innerHTML = activeNames().map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
+}
+
+// ---------- swipe rows ----------
+function setOpen(row, open){
+  row.classList.toggle('open', open);
+  if(open) openRow = row;
+  else if(openRow === row) openRow = null;
+}
+
+function attachSwipe(row){
+  const content = row.querySelector('.row-content');
+  const name = row.getAttribute('data-name');
+  let startX = 0, startY = 0, baseX = 0, curX = 0, lastX = 0, lastT = 0, vx = 0;
+  let pid = null, tracking = false, decided = false;
+
+  content.addEventListener('pointerdown', (e)=>{
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
+    tracking = true; decided = false; pid = e.pointerId;
+    startX = lastX = e.clientX; startY = e.clientY; lastT = e.timeStamp; vx = 0;
+    baseX = row.classList.contains('open') ? OPEN_X : 0;
+    curX = baseX;
+    row._dragged = false;
+  });
+  content.addEventListener('pointermove', (e)=>{
+    if(!tracking || e.pointerId !== pid) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if(!decided){
+      if(Math.abs(dx) < 7 && Math.abs(dy) < 7) return;
+      if(Math.abs(dy) > Math.abs(dx)){ tracking = false; return; }   // vertical scroll, not a swipe
+      decided = true; row._dragged = true;
+      try{ content.setPointerCapture(pid); }catch(_){}
+      content.style.transition = 'none';
+      row.classList.add('swiping');
+      if(openRow && openRow !== row) setOpen(openRow, false);
+    }
+    let x = baseX + dx;
+    if(x > 0) x = x * 0.2;                           // soft resistance past closed
+    if(x < OPEN_X) x = OPEN_X + (x - OPEN_X) * 0.25; // soft resistance past fully open
+    curX = x;
+    content.style.transform = `translateX(${x}px)`;
+    const dt = Math.max(1, e.timeStamp - lastT);
+    vx = (e.clientX - lastX) / dt;
+    lastX = e.clientX; lastT = e.timeStamp;
+  });
+  const finish = (e)=>{
+    if(!tracking || e.pointerId !== pid) return;
+    tracking = false;
+    if(!decided) return;
+    content.style.transition = '';
+    content.style.transform = '';
+    row.classList.remove('swiping');
+    try{ content.releasePointerCapture(pid); }catch(_){}
+    const open = vx < -0.4 ? true : vx > 0.4 ? false : curX < OPEN_X / 2;
+    setOpen(row, open);
+  };
+  content.addEventListener('pointerup', finish);
+  content.addEventListener('pointercancel', finish);
+  content.addEventListener('click', ()=>{
+    if(row._dragged){ row._dragged = false; return; }
+    if(row.classList.contains('open')){ setOpen(row, false); return; }
+    openDetail(name);
+  });
+  content.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openDetail(name); }
   });
 }
 
-function renderTable(){
-  const names = Object.keys(beans).sort((a,b)=>{
-    return (beans[b].lastUsed||'').localeCompare(beans[a].lastUsed||'');
+document.addEventListener('pointerdown', (e)=>{
+  if(openRow && !openRow.contains(e.target)) setOpen(openRow, false);
+}, true);
+
+function animateOut(row, done){
+  if(reduceMotion){ done(); return; }
+  row.style.height = row.offsetHeight + 'px';
+  row.getBoundingClientRect();           // force layout so the height transition has a start value
+  row.classList.add('leaving');
+  setTimeout(done, 260);
+}
+
+function onRowAction(e){
+  const btn = e.target.closest ? e.target.closest('.act') : null;
+  if(!btn) return;
+  const row = btn.closest('.bean-row');
+  const name = row.getAttribute('data-name');
+  const act = btn.getAttribute('data-act');
+  animateOut(row, ()=>{
+    if(act === 'remove') removeBean(name);
+    else setArchived(name, act === 'archive');
   });
-  tableBody.innerHTML = '';
-  emptyMsg.style.display = names.length ? 'none' : 'block';
-  names.forEach(name=>{
-    const b = beans[name];
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="bean-name">${escapeHtml(name)}</td>
-      <td>${escapeHtml(b.lastUsedDisplay || b.lastUsed || '')}</td>
-      <td>${b.grindSize ?? ''}</td>
-      <td class="${pullTimeClass(b.pullTime)}">${b.pullTime != null ? b.pullTime + 's' : ''}</td>
-      <td class="comments">${escapeHtml(b.comments || '')}</td>
-      <td><button class="del-btn" data-name="${escapeHtml(name)}">Remove</button></td>
-    `;
-    tableBody.appendChild(tr);
+}
+beanList.addEventListener('click', onRowAction);
+archList.addEventListener('click', onRowAction);
+
+archToggle.addEventListener('click', ()=>{
+  const open = !archWrap.classList.contains('open');
+  archWrap.classList.toggle('open', open);
+  archToggle.setAttribute('aria-expanded', String(open));
+});
+
+function setArchived(name, flag, quiet){
+  const b = beans[name];
+  if(!b) return;
+  beans[name] = Object.assign({}, b, { archived: flag ? 1 : 0, updated: Date.now() });
+  saveData();
+  renderAll();
+  syncNow(false);
+  if(!quiet){
+    toast(`${flag ? 'Archived' : 'Restored'} ${name}`, 'Undo', ()=> setArchived(name, !flag, true));
+  }
+}
+function removeBean(name){
+  const prev = beans[name];
+  if(!prev) return;
+  removed[name] = Date.now();
+  delete beans[name];
+  saveData();
+  renderAll();
+  syncNow(false);
+  toast(`Removed ${name}`, 'Undo', ()=>{
+    beans[name] = Object.assign({}, prev, { updated: Date.now() });
+    saveData();
+    renderAll();
+    syncNow(false);
   });
-  tableBody.querySelectorAll('.del-btn').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const name = e.target.getAttribute('data-name');
-      removed[name] = Date.now();
-      delete beans[name];
-      saveData();
-      renderOptions();
-      renderTable();
-      syncNow(false);
-    });
-  });
+}
+
+// ---------- render: history + detail ----------
+function dateBlock(iso, fallback){
+  const d = parseISO(iso);
+  if(!d){
+    return `<div class="hist-date"><b>–</b><span>${escapeHtml(String(fallback || '').slice(0, 6))}</span></div>`;
+  }
+  return `<div class="hist-date"><b>${d.getDate()}</b><span>${escapeHtml(d.toLocaleDateString(undefined, { month:'short' }))}</span></div>`;
+}
+function histRow(e, showName){
+  const pull = e.pullTime != null ? e.pullTime + 's' : '–';
+  const grind = e.grindSize != null ? e.grindSize : '–';
+  const note = e.comments ? `<div class="hist-note">${escapeHtml(e.comments)}</div>` : '';
+  const main = `<div class="hist-name">${showName ? escapeHtml(e.name) : 'Grind ' + escapeHtml(grind)}</div>${note}`;
+  const right = `<div class="hist-pull ${pullTimeClass(e.pullTime)}">${pull}</div>` +
+                (showName ? `<div class="hist-grind">grind ${escapeHtml(grind)}</div>` : '');
+  return `<div class="hist-row${showName ? '' : ' static'}" data-name="${escapeHtml(e.name)}"${showName ? ' role="button" tabindex="0"' : ''}>${dateBlock(e.date, e.dateDisplay)}<div class="hist-main">${main}</div><div class="hist-right">${right}</div></div>`;
 }
 
 function renderHistory(){
-  const sorted = [...logs].sort((a,b)=>{
-    return ((b.date||'') + b.id).localeCompare((a.date||'') + a.id);
-  });
-  historyBody.innerHTML = '';
+  const sorted = sortedLogsDesc(logs);
+  histCount.textContent = sorted.length ? `${sorted.length} brew${sorted.length === 1 ? '' : 's'}` : '';
   historyEmptyMsg.style.display = sorted.length ? 'none' : 'block';
-  sorted.forEach(entry=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="bean-name">${escapeHtml(entry.name)}</td>
-      <td class="history-row-date">${escapeHtml(entry.dateDisplay || entry.date || '')}</td>
-      <td>${entry.grindSize ?? ''}</td>
-      <td class="${pullTimeClass(entry.pullTime)}">${entry.pullTime != null ? entry.pullTime + 's' : ''}</td>
-      <td class="comments">${escapeHtml(entry.comments || '')}</td>
-    `;
-    historyBody.appendChild(tr);
+  let html = '', lastKey = null;
+  sorted.forEach(e=>{
+    const key = (e.date || '').slice(0, 7);
+    if(key !== lastKey){
+      lastKey = key;
+      html += `<div class="hist-month">${escapeHtml(monthLabel(e.date))}</div>`;
+    }
+    html += histRow(e, true);
   });
+  historyList.innerHTML = html;
 }
 
-function escapeHtml(str){
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+function beanStats(asc){
+  const pulls = asc.filter(r => r.pullTime != null);
+  const avg = pulls.length ? Math.round(pulls.reduce((s, r) => s + r.pullTime, 0) / pulls.length) : null;
+  const tally = {};
+  asc.forEach((r, i)=>{
+    if(r.pullTime != null && r.pullTime >= 25 && r.pullTime <= 35 && r.grindSize != null){
+      const k = String(r.grindSize);
+      if(!tally[k]) tally[k] = { grind: r.grindSize, count: 0, last: 0 };
+      tally[k].count++; tally[k].last = i;
+    }
+  });
+  const best = Object.keys(tally).map(k => tally[k]).sort((a, b)=> b.count - a.count || b.last - a.last)[0] || null;
+  return { count: asc.length, avg, sweet: best ? best.grind : null };
 }
 
-// --- Grind recommendation ---
+function chartSVG(asc){
+  const pts = asc.filter(r => r.pullTime != null);
+  if(!pts.length) return '<div class="empty">No pull times logged yet.</div>';
+  const W = 320, H = 124, L = 28, R = 10, T = 10, B = 22;
+  const vals = pts.map(p => p.pullTime);
+  const lo = Math.floor(Math.min(15, Math.min.apply(null, vals) - 3) / 5) * 5;
+  const hi = Math.ceil(Math.max(45, Math.max.apply(null, vals) + 3) / 5) * 5;
+  const y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+  const n = pts.length;
+  const x = i => n === 1 ? L + (W - L - R) / 2 : L + i * (W - L - R) / (n - 1);
+  const band = `<rect x="${L}" y="${y(35).toFixed(1)}" width="${W - L - R}" height="${(y(25) - y(35)).toFixed(1)}" fill="var(--pull-good)" opacity=".13" rx="3"/>`;
+  const labels = [25, 35].map(v => `<text x="${L - 5}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end" class="ch-t">${v}</text>`).join('');
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.pullTime).toFixed(1)}`).join(' ');
+  const line = n > 1 ? `<path d="${d}" pathLength="1" class="ch-line" fill="none"/>` : '';
+  const dots = pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.pullTime).toFixed(1)}" r="3.4" class="ch-dot ${p.pullTime >= 25 && p.pullTime <= 35 ? 'g' : 'b'}" style="animation-delay:${Math.min(i * 25, 600) + 250}ms"/>`).join('');
+  const x1 = `<text x="${L}" y="${H - 5}" class="ch-t">${escapeHtml(shortDate(pts[0].date))}</text>`;
+  const x2 = n > 1 ? `<text x="${W - R}" y="${H - 5}" text-anchor="end" class="ch-t">${escapeHtml(shortDate(pts[n - 1].date))}</text>` : '';
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pull time trend, green band is 25 to 35 seconds">${band}${labels}${line}${dots}${x1}${x2}</svg>`;
+}
+
+let detailName = null;
+function renderDetail(name){
+  const rows = sortedLogsDesc(logs.filter(l => l.name === name));
+  const asc = [...rows].reverse();
+  const st = beanStats(asc);
+  detailNameEl.textContent = name;
+  detailSub.textContent = rows.length
+    ? `Last brewed ${shortDate(rows[0].date, rows[0].dateDisplay)}${beans[name] && beans[name].archived ? ' · archived' : ''}`
+    : 'No brews logged yet';
+  detailStats.innerHTML =
+    `<div class="stat"><b>${st.count}</b><span>Brews</span></div>` +
+    `<div class="stat"><b>${st.avg != null ? st.avg + 's' : '–'}</b><span>Avg pull</span></div>` +
+    `<div class="stat"><b>${st.sweet != null ? escapeHtml(st.sweet) : '–'}</b><span>Sweet spot</span></div>`;
+  detailChart.innerHTML = chartSVG(asc);
+  detailList.innerHTML = rows.map(e => histRow(e, false)).join('');
+}
+
+function openDetail(name){
+  detailName = name;
+  renderDetail(name);
+  go('detail');
+}
+function onHistClick(e){
+  const row = e.target.closest ? e.target.closest('.hist-row') : null;
+  if(row && row.getAttribute('data-name') && row.parentNode !== detailList) openDetail(row.getAttribute('data-name'));
+}
+historyList.addEventListener('click', onHistClick);
+historyList.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); onHistClick(e); }
+});
+
+function renderAll(){
+  renderOptions();
+  renderBeans();
+  renderHistory();
+  if(currentView === 'detail' && detailName) renderDetail(detailName);
+}
+
+// ---------- navigation (with the phone's back gesture) ----------
+let currentView = 'main';
+let mainScroll = 0;
+const VIEWS = { main: mainView, history: historyView, detail: detailView };
+
+function showView(name, dir){
+  if(!VIEWS[name]) name = 'main';
+  if(currentView === 'main') mainScroll = window.scrollY || 0;
+  Object.keys(VIEWS).forEach(k => VIEWS[k].classList.remove('active', 'back'));
+  VIEWS[name].classList.add('active');
+  if(dir === 'back') VIEWS[name].classList.add('back');
+  currentView = name;
+  document.body.setAttribute('data-view', name);
+  if(openRow) setOpen(openRow, false);
+  try{ window.scrollTo(0, name === 'main' ? mainScroll : 0); }catch(e){}
+}
+function go(name){
+  try{ history.pushState({ v: name, n: detailName }, ''); }catch(e){}
+  showView(name, 'fwd');
+}
+function goBack(){
+  if(history.state && history.state.v && history.state.v !== 'main'){ history.back(); }
+  else showView('main', 'back');
+}
+window.addEventListener('popstate', (e)=>{
+  const s = e.state || { v: 'main' };
+  if(s.v === 'detail' && s.n){ detailName = s.n; renderDetail(s.n); }
+  showView(s.v || 'main', 'back');
+});
+try{ history.replaceState({ v: 'main' }, ''); }catch(e){}
+
+historyToggleBtn.addEventListener('click', ()=> go('history'));
+backBtn.addEventListener('click', goBack);
+detailBackBtn.addEventListener('click', goBack);
+
+// ---------- grind recommendation ----------
 function showGrindHint(name){
   const existing = beans[name];
   if(!existing || existing.pullTime == null){
@@ -792,7 +1258,9 @@ function showGrindHint(name){
   }
   const pt = existing.pullTime;
   grindHint.style.display = 'flex';
-  grindHint.classList.remove('good','adjust');
+  grindHint.classList.remove('good', 'adjust');
+  // restart the entrance animation
+  grindHint.style.animation = 'none'; void grindHint.offsetWidth; grindHint.style.animation = '';
 
   if(pt >= 25 && pt <= 35){
     grindHint.classList.add('good');
@@ -800,20 +1268,15 @@ function showGrindHint(name){
     grindHintText.textContent = `Last pull was ${pt}s — dialed in. Same grind should work.`;
     return;
   }
-
   const needFiner = pt < 25;
   const lowerIsFiner = settings.grindDirection === 'lowerFiner';
   const goLower = needFiner ? lowerIsFiner : !lowerIsFiner;
-  const arrow = goLower ? '↓' : '↑';
-  const numberHint = goLower ? 'a lower number' : 'a higher number';
-  const adjective = needFiner ? 'finer' : 'coarser';
-  const reason = needFiner ? 'too fast' : 'too slow';
-
   grindHint.classList.add('adjust');
-  grindHintArrow.textContent = arrow;
-  grindHintText.textContent = `Last pull was ${pt}s (${reason}) — try ${adjective}, ${numberHint}.`;
+  grindHintArrow.textContent = goLower ? '↓' : '↑';
+  grindHintText.textContent = `Last pull was ${pt}s (${needFiner ? 'too fast' : 'too slow'}) — try ${needFiner ? 'finer' : 'coarser'}, ${goLower ? 'a lower number' : 'a higher number'}.`;
 }
 
+// ---------- log a brew ----------
 beanInput.addEventListener('input', ()=>{
   const name = beanInput.value.trim();
   const hasValue = name.length > 0;
@@ -827,7 +1290,7 @@ beanInput.addEventListener('input', ()=>{
       commentsInput.value = existing.comments ?? '';
     }
     showGrindHint(name);
-  } else {
+  }else{
     grindHint.style.display = 'none';
   }
   statusMsg.textContent = '';
@@ -837,11 +1300,11 @@ saveBtn.addEventListener('click', ()=>{
   const name = beanInput.value.trim();
   if(!name){
     statusMsg.textContent = 'Enter a bean name first.';
+    beanInput.classList.remove('shake'); void beanInput.offsetWidth; beanInput.classList.add('shake');
     return;
   }
   const grind = grindInput.value;
   const time = timeInput.value;
-
   const entry = {
     id: Date.now().toString(36),
     name: name,
@@ -851,8 +1314,7 @@ saveBtn.addEventListener('click', ()=>{
     pullTime: time !== '' ? Number(time) : null,
     comments: commentsInput.value.trim()
   };
-
-  beans[name] = {
+  beans[name] = {                         // logging a brew also un-archives the bean
     lastUsed: entry.date,
     lastUsedDisplay: entry.dateDisplay,
     grindSize: entry.grindSize,
@@ -861,11 +1323,8 @@ saveBtn.addEventListener('click', ()=>{
     updated: Date.now()
   };
   logs.push(entry);
-
   saveData();
-  renderOptions();
-  renderTable();
-  renderHistory();
+  renderAll();
 
   beanInput.value = '';
   grindInput.value = '';
@@ -873,19 +1332,9 @@ saveBtn.addEventListener('click', ()=>{
   commentsInput.value = '';
   revealSection.classList.remove('open');
   grindHint.style.display = 'none';
-  statusMsg.textContent = `Logged ${name}.`;
-
+  statusMsg.textContent = '';
+  toast(`Logged ${name}${entry.pullTime != null ? ' · ' + entry.pullTime + 's' : ''}`);
   syncNow(false);
-});
-
-historyToggleBtn.addEventListener('click', ()=>{
-  mainView.classList.remove('active');
-  historyView.classList.add('active');
-});
-
-backBtn.addEventListener('click', ()=>{
-  historyView.classList.remove('active');
-  mainView.classList.add('active');
 });
 
 // --- Merge (edit by edit, never whole-state overwrite) ---
@@ -926,9 +1375,7 @@ function applyState(state){
   logs = state.logs;
   removed = state.removed;
   saveData();
-  renderOptions();
-  renderTable();
-  renderHistory();
+  renderAll();
 }
 
 loadData();
@@ -1165,6 +1612,20 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   });
 }
+
+// ---------- one-time hint that rows can be swiped ----------
+function maybeNudge(){
+  if(settings.swipeHint || reduceMotion) return;
+  const first = beanList.querySelector('.bean-row .row-content');
+  if(!first) return;
+  settings.swipeHint = true;
+  saveSettings();
+  setTimeout(()=>{
+    first.classList.add('nudge');
+    first.addEventListener('animationend', ()=> first.classList.remove('nudge'), { once: true });
+  }, 900);
+}
+maybeNudge();
 </script>
 </body>
 </html>
