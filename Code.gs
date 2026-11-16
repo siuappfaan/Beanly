@@ -1,4 +1,4 @@
-// Beanly — Google Sheet sync backend (v1.4.0: syncs brew edits and deletions)
+// Beanly — Google Sheet sync backend (v1.5.0: POST now returns the merged state)
 //
 // Setup (first time):
 // 1. Create a new Google Sheet, then Extensions > Apps Script.
@@ -196,5 +196,5 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
-  return json_({ status: 'ok' });
+  return json_(merged);                 // the app applies this, so a push is also a pull
 }

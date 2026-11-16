@@ -434,21 +434,37 @@
   .install-banner button{ background:#fff; color:#5E3A20; border:none; border-radius:8px; padding:7px 12px; font-weight:600; font-size:.85rem; cursor:pointer; white-space:nowrap; }
   .version-footer{ text-align:center; margin-top:6px; }
   .version-footer button{
+    display:inline-flex;
+    align-items:center;
     background:none;
     border:none;
-    color:var(--heading);
-    opacity:.4;
+    color:var(--muted);
     font-size:.75rem;
     cursor:pointer;
-    padding:8px;
+    padding:8px 10px;
     user-select:none;
     -webkit-user-select:none;
     -webkit-touch-callout:none;
     touch-action:manipulation;
-    transition:opacity .2s ease;
+    transition:transform .7s var(--ease), color .2s ease;
   }
-  .version-footer button:hover{ opacity:.75; }
-  .version-footer button.holding{ opacity:.85; }
+  .version-footer button:hover{ color:var(--heading); }
+  .version-footer button:active:not(:disabled){ transform:none; }
+  .version-footer button.holding, .version-footer button.holding:active{ transform:scale(1.5) !important; color:var(--heading); }
+  .sync-dot{
+    display:inline-block;
+    width:6px; height:6px;
+    border-radius:50%;
+    margin-left:7px;
+    background:var(--muted);
+    opacity:.7;
+    transition:background .3s ease, opacity .3s ease;
+  }
+  .sync-dot[data-s="ok"]{ background:var(--pull-good); opacity:1; }
+  .sync-dot[data-s="sync"]{ background:#E0A63A; opacity:1; animation:syncPulse 1s ease-in-out infinite; }
+  .sync-dot[data-s="off"]{ background:#D2625A; opacity:1; }
+  .sync-dot[data-s="none"]{ display:none; }
+  @keyframes syncPulse{ 50%{ opacity:.35; } }
 
   /* ---------- v1.4: gear, chips, edit sheet, steppers ---------- */
   input[type=date]{ appearance:none; -webkit-appearance:none; min-height:46px; text-align:left; }
@@ -605,6 +621,29 @@
   body[data-view="detail"] .fab:hover{ background:var(--roast-dark); }
   body[data-view="detail"] .fab:active{ transform:scale(.92); }
   body[data-view="detail"] .toast{ bottom:calc(90px + env(safe-area-inset-bottom, 0px)); }
+
+  /* ---------- sync section in the What's new panel ---------- */
+  .sync-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+    background:none;
+    border:none;
+    padding:8px 0 4px;
+    cursor:pointer;
+    color:var(--espresso);
+    text-align:left;
+  }
+  .sync-row:active:not(:disabled){ transform:none; }
+  .sync-row .t{ font-size:.8rem; font-weight:600; }
+  .sync-row .s{ font-size:.7rem; color:var(--muted); margin-left:auto; }
+  .sync-row .chev{ width:15px; height:15px; flex:none; color:var(--muted); transition:transform .3s var(--ease); }
+  .sync-row[aria-expanded="true"] .chev{ transform:rotate(180deg); }
+  .sync-body{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s var(--ease); }
+  .sync-body.open{ grid-template-rows:1fr; }
+  .sync-inner{ overflow:hidden; min-height:0; padding:0 3px 3px; margin:0 -3px; }
+  .btn-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
 
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation-duration:.01ms !important; animation-delay:0ms !important; transition-duration:.01ms !important; }
@@ -825,7 +864,7 @@
     </div>
 
     <div class="version-footer">
-      <button id="versionBtn">v1.4.0</button>
+      <button id="versionBtn"><span id="versionText">v1.5.0</span><i class="sync-dot" id="syncDot" data-s="none"></i></button>
     </div>
   </div>
 
@@ -879,22 +918,32 @@
     <div id="changelogList"></div>
 
     <div class="m-sect">Sync &amp; data</div>
-    <div class="m-label">Google Sheet sync</div>
-    <div class="sheet-row">
-      <input type="text" class="sheet-input" id="sheetUrlInput" placeholder="Apps Script web app URL">
-      <button class="sm solid" id="sheetSaveBtn">Save</button>
-      <button class="sm" id="sheetSyncBtn">Sync</button>
-    </div>
-    <div class="m-note" id="syncStatus"></div>
+    <button class="sync-row" id="syncRow" aria-expanded="false">
+      <span class="t">Google Sheets sync</span>
+      <span class="s" id="syncStatusText">Not connected</span>
+      <svg class="ic chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sync-body" id="syncBody"><div class="sync-inner">
+      <div class="m-note">Paste your Apps Script web app URL. Share the invite link so both phones use the same sheet.</div>
+      <div class="sheet-row">
+        <input type="text" class="sheet-input" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/…/exec" autocapitalize="off" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="btn-row">
+        <button class="sm solid" id="syncConnectBtn">Connect</button>
+        <button class="sm" id="syncInviteBtn" style="display:none;">Copy invite link</button>
+        <button class="sm" id="syncDisconnectBtn" style="display:none;">Disconnect</button>
+      </div>
+      <div class="m-note" id="syncMsg"></div>
+    </div></div>
     <div class="m-row">
       <span>Data</span>
       <div class="btn-pair">
-        <button class="sm" id="backupBtn">Backup</button>
+        <button class="sm" id="backupBtn">Back up</button>
         <button class="sm" id="restoreBtn">Restore</button>
       </div>
     </div>
     <div class="m-note" id="dataStatus"></div>
-    <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+    <input type="file" id="restoreFile" accept=".json,.txt,application/json,text/plain" hidden>
   </div>
 </div>
 
@@ -1027,8 +1076,19 @@
 </div>
 
 <script>
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.5.0';
 const CHANGELOG = [
+  {
+    version: '1.5.0',
+    date: '16 Nov 2026',
+    items: [
+      'Sync status dot next to the version: green connected, amber syncing, red can’t reach the sheet',
+      'New Google Sheets sync section in What’s new, with Connect, Copy invite link and Disconnect',
+      'Sync now runs by itself: after a change, every 15 s while open, on reopening and when back online',
+      'Back up refuses to save an empty file and names files with the time. Restore says exactly what it found',
+      'Hold the version number for 0.7 s; it grows while you hold'
+    ]
+  },
   {
     version: '1.4.0',
     date: '2 Nov 2026',
@@ -1434,7 +1494,7 @@ function setArchived(name, flag, quiet){
   beans[name] = Object.assign({}, b, { archived: flag ? 1 : 0, updated: Date.now() });
   saveData();
   renderAll();
-  syncNow(false);
+  queueSync();
   if(!quiet){
     toast(`${flag ? 'Archived' : 'Restored'} ${name}`, 'Undo', ()=> setArchived(name, !flag, true));
   }
@@ -1446,12 +1506,12 @@ function removeBean(name){
   delete beans[name];
   saveData();
   renderAll();
-  syncNow(false);
+  queueSync();
   toast(`Removed ${name}`, 'Undo', ()=>{
     beans[name] = Object.assign({}, prev, { updated: Date.now() });
     saveData();
     renderAll();
-    syncNow(false);
+    queueSync();
   });
 }
 
@@ -1679,7 +1739,7 @@ function addBrew(o){
   beans[o.name].archived = 0;           // logging a brew also un-archives the bean
   saveData();
   renderAll();
-  syncNow(false);
+  queueSync();
   return entry;
 }
 
@@ -1814,7 +1874,7 @@ function reconcileBean(name, create){
 function afterLogChange(){
   saveData();
   renderAll();
-  syncNow(false);
+  queueSync();
   if(currentView === 'detail' && detailName && !logs.some(l => l.name === detailName)) goBack();
 }
 
@@ -2067,16 +2127,22 @@ grindDirToggle.addEventListener('click', (e)=>{
 // --- "What's new" panel: hold the version number to open ---
 const modalBackdrop = document.getElementById('modalBackdrop');
 const versionBtn = document.getElementById('versionBtn');
+const versionText = document.getElementById('versionText');
+const syncDot = document.getElementById('syncDot');
+const syncRow = document.getElementById('syncRow');
+const syncBody = document.getElementById('syncBody');
+const syncStatusText = document.getElementById('syncStatusText');
+const syncConnectBtn = document.getElementById('syncConnectBtn');
+const syncInviteBtn = document.getElementById('syncInviteBtn');
+const syncDisconnectBtn = document.getElementById('syncDisconnectBtn');
+const syncMsg = document.getElementById('syncMsg');
 const sheetUrlInput = document.getElementById('sheetUrlInput');
-const sheetSaveBtn = document.getElementById('sheetSaveBtn');
-const sheetSyncBtn = document.getElementById('sheetSyncBtn');
-const syncStatus = document.getElementById('syncStatus');
 const dataStatus = document.getElementById('dataStatus');
 const backupBtn = document.getElementById('backupBtn');
 const restoreBtn = document.getElementById('restoreBtn');
 const restoreFile = document.getElementById('restoreFile');
 
-const HOLD_MS = 800;
+const HOLD_MS = 700;
 let holdTimer = null;
 let openedAt = 0;
 
@@ -2085,7 +2151,9 @@ function openModal(){
   document.getElementById('modalSub').textContent = 'v' + APP_VERSION + ' · ' + CHANGELOG[0].date;
   sheetUrlInput.value = settings.sheetUrl || '';
   dataStatus.textContent = '';
-  applyGrindDirUI();
+  syncMsg.textContent = '';
+  refreshSyncUI();
+  setSyncBodyOpen(!settings.sheetUrl);            // opens by itself when not connected
   modalBackdrop.classList.add('open');
 }
 function closeModal(){
@@ -2093,7 +2161,7 @@ function closeModal(){
 }
 function startHold(){
   cancelHold();
-  versionBtn.classList.add('holding');
+  versionBtn.classList.add('holding');            // grows to 1.5x while held
   holdTimer = setTimeout(()=>{
     holdTimer = null;
     versionBtn.classList.remove('holding');
@@ -2105,7 +2173,7 @@ function cancelHold(){
   if(holdTimer){ clearTimeout(holdTimer); holdTimer = null; }
   versionBtn.classList.remove('holding');
 }
-versionBtn.textContent = 'v' + APP_VERSION;
+versionText.textContent = 'v' + APP_VERSION;
 versionBtn.addEventListener('pointerdown', startHold);
 ['pointerup','pointerleave','pointercancel'].forEach(ev=> versionBtn.addEventListener(ev, cancelHold));
 versionBtn.addEventListener('contextmenu', (e)=> e.preventDefault());
@@ -2127,109 +2195,233 @@ renderChangelog();
 
 // --- Backup / Restore ---
 function setDataStatus(msg){ dataStatus.textContent = msg; }
+function pad2(n){ return String(n).padStart(2, '0'); }
 
 backupBtn.addEventListener('click', ()=>{
+  if(!logs.length && !Object.keys(beans).length){
+    setDataStatus('Nothing to back up yet. Log a brew first, so you never save an empty file.');
+    return;
+  }
   const payload = {
     app: 'Beanly',
     version: APP_VERSION,
     exported: new Date().toISOString(),
     beans, logs, removed, removedLogs
   };
+  const now = new Date();
+  const name = 'Beanly_backup_' + isoToday() + '_' + pad2(now.getHours()) + pad2(now.getMinutes()) + '.json';
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'Beanly_backup_' + isoToday() + '.json';
+  a.download = name;                               // includes the time, so two backups never share a name
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(()=> URL.revokeObjectURL(url), 2000);
-  setDataStatus('Backup saved to your downloads.');
+  setDataStatus(`Backed up ${logs.length} brew${logs.length === 1 ? '' : 's'}. Look in your Downloads.`);
 });
 
 restoreBtn.addEventListener('click', ()=> restoreFile.click());
 restoreFile.addEventListener('change', async ()=>{
   const file = restoreFile.files && restoreFile.files[0];
   if(!file) return;
+  let data;
   try{
-    const data = JSON.parse(await file.text());
-    if(!data || (!data.logs && !data.beans)) throw new Error('not a Beanly backup');
+    data = JSON.parse(String(await file.text()).replace(/^\uFEFF/, ''));
+  }catch(e){
+    setDataStatus("That file isn't readable. Choose a Beanly backup (.json).");
+    restoreFile.value = '';
+    return;
+  }
+  const meta = (data && !Array.isArray(data)) ? data : {};
+  const inLogs = Array.isArray(data) ? data : (Array.isArray(meta.logs) ? meta.logs : null);
+  const inBeans = meta.beans && typeof meta.beans === 'object' ? meta.beans : {};
+  if(!inLogs && !Object.keys(inBeans).length){
+    setDataStatus("That doesn't look like a Beanly backup.");
+  }else if(!(inLogs || []).length && !Object.keys(inBeans).length){
+    setDataStatus('That backup is empty: it has 0 brews in it. Pick a different file.');
+  }else{
     const before = logs.length;
     applyState(mergeStates(currentState(), {
-      beans: data.beans || {},
-      logs: data.logs || [],
-      removed: data.removed || {},
-      removedLogs: data.removedLogs || {}
+      beans: inBeans,
+      logs: inLogs || [],
+      removed: meta.removed || {},
+      removedLogs: meta.removedLogs || {}
     }));
-    setDataStatus(`Restored — ${logs.length - before} new brews added.`);
-    syncNow(false);
-  }catch(e){
-    setDataStatus("That file couldn't be read.");
+    const added = logs.length - before;
+    setDataStatus(added
+      ? `Restored — ${added} new brew${added === 1 ? '' : 's'} added.`
+      : ((inLogs || []).length ? `Nothing new — those ${inLogs.length} brews are already in Beanly.` : 'Restored.'));
+    queueSync();
   }
   restoreFile.value = '';
 });
 
-// --- Google Sheet sync (pull, merge, push) ---
-let syncing = false;
-let syncAgain = false;
-let lastSync = 0;
+// --- Google Sheets sync: status dot, connect / invite / disconnect ---
+// GET returns the stored data, POST (plain-text JSON) merges ours in and returns the merged state.
+const SYNC_LABELS = {
+  ok: 'Connected',
+  sync: 'Syncing…',
+  off: 'Can’t reach the sheet',
+  none: 'Not connected',
+  idle: 'Waiting to sync'
+};
+const SYNC_DEBOUNCE_MS = 700;
+const SYNC_POLL_MS = 15000;
+let syncState = 'none';
+let syncTimer = null;
+let syncRunning = false;
+let syncRerun = false;
 
-function setSyncStatus(msg){
-  syncStatus.textContent = msg;
+function setSyncState(s){
+  syncState = s;
+  syncDot.setAttribute('data-s', s);              // ok = green, sync = amber pulse, off = red, none = hidden, idle = grey
+  syncStatusText.textContent = SYNC_LABELS[s] || '';
 }
-
-async function syncNow(showStatus){
+function setSyncBodyOpen(open){
+  syncBody.classList.toggle('open', open);
+  syncRow.setAttribute('aria-expanded', String(open));
+}
+function refreshSyncUI(){
+  const on = !!settings.sheetUrl;
+  syncInviteBtn.style.display = on ? '' : 'none';
+  syncDisconnectBtn.style.display = on ? '' : 'none';
+}
+function isScriptUrl(u){
+  return /^https:\/\/script\.google\.com\//.test(u);
+}
+// A compact fingerprint of a state: which brews / beans / deletions it knows about, and how new each is.
+function canon(s){
+  const part = (obj, f) => Object.keys(obj || {}).sort().map(k => k + ':' + f(obj[k])).join(',');
+  return [
+    (s.logs || []).map(l => l.id + ':' + logStamp(l)).sort().join(','),
+    part(s.beans, b => normBean(b).updated + ':' + (b.archived ? 1 : 0)),
+    part(s.removed, v => Number(v) || 0),
+    part(s.removedLogs, v => Number(v) || 0)
+  ].join('|');
+}
+async function fetchRemote(url){
+  const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+  if(res.ok === false) throw new Error('http ' + res.status);
+  const data = JSON.parse(await res.text());       // an HTML error page throws here
+  if(data !== null && typeof data !== 'object') throw new Error('unexpected reply');
+  return data || {};
+}
+function queueSync(){                              // call after any local change: waits 700 ms, then syncs once
   if(!settings.sheetUrl) return;
-  if(syncing){ syncAgain = true; return; }
-  syncing = true;
-  if(showStatus) setSyncStatus('Syncing…');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(runSync, SYNC_DEBOUNCE_MS);
+}
+async function runSync(){
+  if(!settings.sheetUrl){ setSyncState('none'); return; }
+  if(syncRunning){ syncRerun = true; return; }
+  syncRunning = true;
+  setSyncState('sync');
   try{
-    const res = await fetch(settings.sheetUrl, { method: 'GET' });
-    const remote = await res.json();
-    applyState(mergeStates(currentState(), remote));
-    await fetch(settings.sheetUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(currentState())
-    });
-    lastSync = Date.now();
-    setSyncStatus('Synced ' + new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }));
+    const remote = await fetchRemote(settings.sheetUrl);
+    const merged = mergeStates(currentState(), remote);
+    if(canon(merged) !== canon(currentState())) applyState(merged);       // something new arrived
+    if(canon(merged) !== canon(remote)){                                  // the sheet is missing something: push
+      const res = await fetch(settings.sheetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(currentState())
+      });
+      let back = null;
+      try{ back = JSON.parse(await res.text()); }catch(e){}
+      if(back && back.logs && back.beans){                                // the sheet's own merge, in case another phone pushed meanwhile
+        const again = mergeStates(currentState(), back);
+        if(canon(again) !== canon(currentState())) applyState(again);
+      }
+    }
+    setSyncState('ok');
   }catch(e){
-    setSyncStatus("Couldn't reach the sheet — check the URL.");
+    setSyncState('off');
   }
-  syncing = false;
-  if(syncAgain){ syncAgain = false; syncNow(false); }
+  syncRunning = false;
+  if(syncRerun){ syncRerun = false; queueSync(); }
 }
 
-sheetSaveBtn.addEventListener('click', ()=>{
-  settings.sheetUrl = sheetUrlInput.value.trim();
+async function connectSheet(url){
+  url = String(url || '').trim();
+  if(!url){ syncMsg.textContent = 'Paste your Apps Script web app URL first.'; return false; }
+  if(!isScriptUrl(url)){ syncMsg.textContent = 'That doesn’t look like an Apps Script web app URL.'; return false; }
+  const prev = syncState;
+  syncMsg.textContent = 'Connecting…';
+  setSyncState('sync');
+  try{
+    await fetchRemote(url);                        // proves the address answers with data
+  }catch(e){
+    setSyncState(settings.sheetUrl ? (prev === 'sync' ? 'off' : prev) : 'none');
+    syncMsg.textContent = 'Could not reach that URL. Check the deployment is set to "Anyone".';
+    return false;
+  }
+  settings.sheetUrl = url;
   saveSettings();
-  if(settings.sheetUrl){
-    syncNow(true);
-  }else{
-    setSyncStatus('Sync turned off.');
+  sheetUrlInput.value = url;
+  refreshSyncUI();
+  syncMsg.textContent = 'Connected.';
+  await runSync();
+  return true;
+}
+function inviteLink(){
+  return location.origin + location.pathname + '#sync=' + encodeURIComponent(settings.sheetUrl);
+}
+async function copyInvite(){
+  const link = inviteLink();
+  try{
+    await navigator.clipboard.writeText(link);
+    syncMsg.textContent = 'Invite link copied.';
+  }catch(e){
+    try{ window.prompt('Copy this invite link', link); }catch(_){}
+    syncMsg.textContent = 'Copy the invite link from the box.';
   }
-});
-sheetSyncBtn.addEventListener('click', ()=>{
-  if(!settings.sheetUrl){
-    setSyncStatus('Save a sheet URL first.');
-    return;
-  }
-  syncNow(true);
+}
+syncRow.addEventListener('click', ()=> setSyncBodyOpen(!syncBody.classList.contains('open')));
+syncConnectBtn.addEventListener('click', ()=> connectSheet(sheetUrlInput.value));
+syncInviteBtn.addEventListener('click', copyInvite);
+syncDisconnectBtn.addEventListener('click', ()=>{
+  clearTimeout(syncTimer);
+  settings.sheetUrl = '';
+  saveSettings();
+  sheetUrlInput.value = '';
+  setSyncState('none');
+  refreshSyncUI();
+  syncMsg.textContent = 'Sync turned off.';
 });
 
+// pull every 15 s while visible, when the app comes back to the front, and when the phone is back online
+setInterval(()=>{ if(document.visibilityState === 'visible' && settings.sheetUrl) runSync(); }, SYNC_POLL_MS);
 document.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState === 'visible' && settings.sheetUrl && Date.now() - lastSync > 30000){
-    syncNow(false);
-  }
+  if(document.visibilityState === 'visible' && settings.sheetUrl) runSync();
 });
+window.addEventListener('online', ()=>{ if(settings.sheetUrl) runSync(); });
+window.addEventListener('offline', ()=>{ if(settings.sheetUrl) setSyncState('off'); });
+
+// an invite link looks like  https://…/#sync=<encoded script URL>
+function takeInviteFromAddress(){
+  const m = /^#sync=(.+)$/.exec(location.hash || '');
+  if(!m) return null;
+  let url = null;
+  try{ url = decodeURIComponent(m[1]); }catch(e){}
+  try{ history.replaceState({ v: 'main' }, '', location.pathname + location.search); }catch(e){}   // clear the hash
+  return url;
+}
 
 loadSettings();
 applyTargetUI();
 applyGrindDirUI();
 renderAll();
-if(settings.sheetUrl) syncNow(false);
+refreshSyncUI();
+setSyncState(settings.sheetUrl ? 'idle' : 'none');
+const inviteUrl = takeInviteFromAddress();
+if(inviteUrl && inviteUrl !== settings.sheetUrl){
+  toast('Connecting to the shared sheet…');
+  connectSheet(inviteUrl).then(good => toast(good ? 'Connected to the shared sheet' : 'Could not connect to that sheet'));
+}else if(settings.sheetUrl){
+  runSync();
+}
 
 // --- PWA install prompt (Android/Chrome) ---
 let deferredPrompt;

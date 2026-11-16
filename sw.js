@@ -1,4 +1,4 @@
-const CACHE_NAME = 'beanly-v10';
+const CACHE_NAME = 'beanly-v11';
 const ASSETS = [
   './',
   './index.html',
