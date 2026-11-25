@@ -1,4 +1,4 @@
-// Beanly — Google Sheet sync backend (v1.5.0: POST now returns the merged state)
+// Beanly — Google Sheet sync backend (v1.6.0: adds dose / yield and per-bean target columns)
 //
 // Setup (first time):
 // 1. Create a new Google Sheet, then Extensions > Apps Script.
@@ -13,8 +13,8 @@
 // The "Beans", "Logs" and "Removed" tabs are created automatically.
 
 var HEADERS = {
-  Beans:   ['Bean', 'LastUsed', 'LastUsedDisplay', 'GrindSize', 'PullTime', 'Comments', 'Updated', 'Archived'],
-  Logs:    ['Id', 'Name', 'Date', 'DateDisplay', 'GrindSize', 'PullTime', 'Comments', 'Updated'],
+  Beans:   ['Bean', 'LastUsed', 'LastUsedDisplay', 'GrindSize', 'PullTime', 'Comments', 'Updated', 'Archived', 'DoseIn', 'YieldOut', 'TargetSec', 'TolSec'],
+  Logs:    ['Id', 'Name', 'Date', 'DateDisplay', 'GrindSize', 'PullTime', 'Comments', 'Updated', 'DoseIn', 'YieldOut'],
   Removed: ['Bean', 'Timestamp'],
   RemovedLogs: ['Id', 'Timestamp']
 };
@@ -52,7 +52,11 @@ function readState_() {
       pullTime: orNull_(r[4]),
       comments: r[5] === null || r[5] === undefined ? '' : String(r[5]),
       updated: Number(r[6]) || 0,
-      archived: Number(r[7]) ? 1 : 0
+      archived: Number(r[7]) ? 1 : 0,
+      doseIn: orNull_(r[8]),
+      yieldOut: orNull_(r[9]),
+      targetSec: orNull_(r[10]),
+      tolSec: orNull_(r[11])
     };
   }
 
@@ -68,7 +72,9 @@ function readState_() {
       grindSize: orNull_(q[4]),
       pullTime: orNull_(q[5]),
       comments: q[6] === null || q[6] === undefined ? '' : String(q[6]),
-      updated: Number(q[7]) || 0
+      updated: Number(q[7]) || 0,
+      doseIn: orNull_(q[8]),
+      yieldOut: orNull_(q[9])
     });
   }
 
@@ -103,13 +109,19 @@ function writeState_(state) {
     return [n, x.lastUsed, x.lastUsedDisplay,
       x.grindSize === null ? '' : x.grindSize,
       x.pullTime === null ? '' : x.pullTime,
-      x.comments || '', x.updated || 0, x.archived ? 1 : 0];
+      x.comments || '', x.updated || 0, x.archived ? 1 : 0,
+      x.doseIn == null ? '' : x.doseIn,
+      x.yieldOut == null ? '' : x.yieldOut,
+      x.targetSec == null ? '' : x.targetSec,
+      x.tolSec == null ? '' : x.tolSec];
   });
   var logRows = state.logs.map(function (e) {
     return [e.id, e.name, e.date, e.dateDisplay,
       e.grindSize === null ? '' : e.grindSize,
       e.pullTime === null ? '' : e.pullTime,
-      e.comments || '', e.updated || 0];
+      e.comments || '', e.updated || 0,
+      e.doseIn == null ? '' : e.doseIn,
+      e.yieldOut == null ? '' : e.yieldOut];
   });
   var removedRows = Object.keys(state.removed).map(function (n) {
     return [n, state.removed[n]];

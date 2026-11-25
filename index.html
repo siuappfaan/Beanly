@@ -645,6 +645,31 @@
   .sync-inner{ overflow:hidden; min-height:0; padding:0 3px 3px; margin:0 -3px; }
   .btn-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
 
+  /* ---------- v1.6: dose / yield, ratio, per-bean target ---------- */
+  .ratio-line{ font-size:.78rem; color:var(--muted); margin:-6px 2px 12px; min-height:1em; font-variant-numeric:tabular-nums; }
+  .ratio-line b{ color:var(--heading); font-weight:600; }
+  .brew-head, .hist-row.brew-row{ grid-template-columns:44px 50px 50px 56px minmax(0,1fr); }
+  .brew-row .bratio{ text-align:center; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .brew-row .bratio b{ display:block; font-size:.9rem; font-weight:600; }
+  .brew-row .bratio span{ display:block; font-size:.6rem; color:var(--muted); margin-top:1px; white-space:nowrap; }
+  .target-chip{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:9px;
+    background:var(--row-alt);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:5px 12px 5px 10px;
+    font-size:.78rem; font-weight:600;
+    color:var(--heading);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .target-chip:hover{ border-color:var(--roast); }
+  .target-chip svg{ width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+  .target-chip small{ font-size:.68rem; font-weight:500; color:var(--muted); }
+  .edit-actions .sm{ padding:0 16px; font-size:.9rem; }
+  #targetSheet .m-row{ padding:8px 0; }
+
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation-duration:.01ms !important; animation-delay:0ms !important; transition-duration:.01ms !important; }
   }
@@ -842,6 +867,17 @@
             <input type="number" id="timeInput" placeholder="e.g. 28" step="1" inputmode="numeric">
           </div>
         </div>
+        <div class="row2">
+          <div class="field">
+            <label for="doseInput">Dose in (g)</label>
+            <input type="number" id="doseInput" step="0.1" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="yieldInput">Yield out (g)</label>
+            <input type="number" id="yieldInput" step="0.1" inputmode="decimal">
+          </div>
+        </div>
+        <div class="ratio-line" id="ratioLine"></div>
         <div class="field">
           <label for="commentsInput">Comments</label>
           <input type="text" id="commentsInput" placeholder="Optional notes — sour, fast pour, etc." enterkeyhint="done">
@@ -864,7 +900,7 @@
     </div>
 
     <div class="version-footer">
-      <button id="versionBtn"><span id="versionText">v1.5.0</span><i class="sync-dot" id="syncDot" data-s="none"></i></button>
+      <button id="versionBtn"><span id="versionText">v1.6.0</span><i class="sync-dot" id="syncDot" data-s="none"></i></button>
     </div>
   </div>
 
@@ -883,6 +919,7 @@
     <div class="card">
       <div class="detail-name" id="detailName"></div>
       <div class="detail-sub" id="detailSub"></div>
+      <button class="target-chip" id="targetChip" aria-label="Set this bean's pull target"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="12" cy="12" r=".6"/></svg><span id="targetChipText"></span></button>
       <div class="stat-row" id="detailStats"></div>
       <div id="detailChart"></div>
     </div>
@@ -892,6 +929,7 @@
         <span><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Date</span>
         <span><svg class="ic" viewBox="0 0 24 24"><circle cx="4.4" cy="12" r="1.2"/><circle cx="10.4" cy="12" r="2.4"/><circle cx="18.2" cy="12" r="3.9"/></svg>Grind</span>
         <span><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.6 1.6M9.5 3h5"/></svg>Pull</span>
+        <span><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="3.5"/><path d="M8 10.5a4 4 0 0 1 8 0"/><path d="M12 10.5l1.7-2.2"/></svg>Ratio</span>
         <span>Notes</span>
       </div>
       <div id="detailList"></div>
@@ -971,23 +1009,23 @@
 
     <div class="m-sect">Target pull time</div>
     <div class="m-row">
-      <span>Fastest good pull</span>
-      <div class="stepper" data-key="targetMin">
-        <button data-d="-1" aria-label="Decrease fastest pull"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
-        <b id="tMinVal"></b>
-        <button data-d="1" aria-label="Increase fastest pull"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+      <span>Default target</span>
+      <div class="stepper" data-key="targetSec">
+        <button data-d="-1" aria-label="Decrease default target"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+        <b id="tTargetVal"></b>
+        <button data-d="1" aria-label="Increase default target"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
       </div>
     </div>
     <div class="m-row">
-      <span>Slowest good pull</span>
-      <div class="stepper" data-key="targetMax">
-        <button data-d="-1" aria-label="Decrease slowest pull"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
-        <b id="tMaxVal"></b>
-        <button data-d="1" aria-label="Increase slowest pull"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+      <span>Tolerance ±</span>
+      <div class="stepper" data-key="tolSec">
+        <button data-d="-1" aria-label="Decrease tolerance"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+        <b id="tTolVal"></b>
+        <button data-d="1" aria-label="Increase tolerance"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
       </div>
     </div>
-    <div class="m-note">Pulls inside this window show green, outside show red. Suggestions, the sweet spot and the chart use it too.</div>
-    <div class="reset-row"><button class="sm" id="targetResetBtn">Reset to 25–35 s</button></div>
+    <div class="m-note" id="targetNote"></div>
+    <div class="reset-row"><button class="sm" id="targetResetBtn">Reset to 30 s ± 5</button></div>
   </div>
 </div>
 
@@ -1017,6 +1055,17 @@
         <input type="number" id="editGrind" step="0.1" inputmode="decimal">
       </div>
     </div>
+    <div class="row2">
+      <div class="field">
+        <label for="editDose">Dose in (g)</label>
+        <input type="number" id="editDose" step="0.1" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="editYield">Yield out (g)</label>
+        <input type="number" id="editYield" step="0.1" inputmode="decimal">
+      </div>
+    </div>
+    <div class="ratio-line" id="editRatio"></div>
     <div class="row2">
       <div class="field">
         <label for="editTime">Pull time (sec)</label>
@@ -1063,6 +1112,17 @@
     </div>
     <div class="row2">
       <div class="field">
+        <label for="logDose">Dose in (g)</label>
+        <input type="number" id="logDose" step="0.1" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="logYield">Yield out (g)</label>
+        <input type="number" id="logYield" step="0.1" inputmode="decimal">
+      </div>
+    </div>
+    <div class="ratio-line" id="logRatio"></div>
+    <div class="row2">
+      <div class="field">
         <label for="logDate">Date</label>
         <input type="date" id="logDate">
       </div>
@@ -1075,9 +1135,55 @@
   </div>
 </div>
 
+<div class="sheet-backdrop" id="targetBackdrop">
+  <div class="edit-sheet" id="targetSheet" role="dialog" aria-label="Pull target">
+    <div class="sheet-grip"></div>
+    <div class="m-head">
+      <div>
+        <div class="m-title">Pull target</div>
+        <div class="m-sub" id="targetSub"></div>
+      </div>
+      <button class="icon-btn" id="targetCloseBtn" aria-label="Close">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="m-row">
+      <span>Target time</span>
+      <div class="stepper" data-key="target">
+        <button data-d="-1" aria-label="Decrease target"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+        <b id="tgTargetVal"></b>
+        <button data-d="1" aria-label="Increase target"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+    </div>
+    <div class="m-row">
+      <span>Tolerance ±</span>
+      <div class="stepper" data-key="tol">
+        <button data-d="-1" aria-label="Decrease tolerance"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+        <b id="tgTolVal"></b>
+        <button data-d="1" aria-label="Increase tolerance"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+    </div>
+    <div class="m-note" id="tgNote"></div>
+    <div class="edit-actions">
+      <button class="sm" id="targetDefaultBtn">Use default</button>
+      <button class="primary" id="targetSaveBtn">Save target</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.6.0';
 const CHANGELOG = [
+  {
+    version: '1.6.0',
+    date: '24 Nov 2026',
+    items: [
+      'Dose in / yield out on every brew, with the ratio shown. New brews default to 18 g in, 36 g out (1:2); earlier brews were set to that too',
+      'Default target pull is now 30 s ± 5 (change it in Settings)',
+      'Each bean can have its own target (tap the target on its page). The green window scales with it, and you can fine-tune the tolerance',
+      'Ratio column on the bean page; ratio also shown on the bean list and History'
+    ]
+  },
   {
     version: '1.5.0',
     date: '16 Nov 2026',
@@ -1155,7 +1261,7 @@ let beans = {};
 let logs = [];
 let removed = {};
 let removedLogs = {};
-let settings = { theme: null, grindDirection: 'lowerFiner', sheetUrl: '', swipeHint: false, targetMin: 25, targetMax: 35 };
+let settings = { theme: null, grindDirection: 'lowerFiner', sheetUrl: '', swipeHint: false, targetSec: 30, tolSec: 5 };
 
 const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 const ACTION_W = 60;
@@ -1202,8 +1308,9 @@ const settingsBtn = $('settingsBtn');
 const settingsBackdrop = $('settingsBackdrop');
 const settingsSheet = $('settingsSheet');
 const settingsCloseBtn = $('settingsCloseBtn');
-const tMinVal = $('tMinVal');
-const tMaxVal = $('tMaxVal');
+const tTargetVal = $('tTargetVal');
+const tTolVal = $('tTolVal');
+const targetNote = $('targetNote');
 const targetResetBtn = $('targetResetBtn');
 const beanChips = $('beanChips');
 const editBackdrop = $('editBackdrop');
@@ -1230,6 +1337,26 @@ const logCloseBtn = $('logCloseBtn');
 const logHint = $('logHint');
 const logHintArrow = $('logHintArrow');
 const logHintText = $('logHintText');
+const doseInput = $('doseInput');
+const yieldInput = $('yieldInput');
+const ratioLine = $('ratioLine');
+const editDose = $('editDose');
+const editYield = $('editYield');
+const editRatio = $('editRatio');
+const logDose = $('logDose');
+const logYield = $('logYield');
+const logRatio = $('logRatio');
+const targetChip = $('targetChip');
+const targetChipText = $('targetChipText');
+const targetBackdrop = $('targetBackdrop');
+const targetSub = $('targetSub');
+const targetSheet = $('targetSheet');
+const tgTargetVal = $('tgTargetVal');
+const tgTolVal = $('tgTolVal');
+const tgNote = $('tgNote');
+const targetDefaultBtn = $('targetDefaultBtn');
+const targetSaveBtn = $('targetSaveBtn');
+const targetCloseBtn = $('targetCloseBtn');
 
 const ICONS = {
   archive: '<svg viewBox="0 0 24 24"><path d="M3.5 4.5h17v4h-17z"/><path d="M5 8.5V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8.5"/><path d="M10 12.5h4"/></svg>',
@@ -1278,13 +1405,90 @@ function readJSON(key, fallback){
     return fallback;
   }
 }
-function tMin(){ const v = Number(settings.targetMin); return v > 0 ? v : 25; }
-function tMax(){ const v = Number(settings.targetMax); return v > tMin() ? v : Math.max(35, tMin() + 2); }
-function inTarget(pt){ return pt != null && pt !== '' && pt >= tMin() && pt <= tMax(); }
-function pullTimeClass(pt){
-  if(pt == null || pt === '') return '';
-  return inTarget(pt) ? 'pull-good' : 'pull-bad';
+const DEFAULT_DOSE = 18, DEFAULT_YIELD = 36, DEFAULT_TARGET = 30, DEFAULT_TOL = 5;
+const clampN = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const round1 = (v) => Math.round(v * 10) / 10;
+function numOrNull(v){ return v !== '' && v != null && isFinite(Number(v)) ? Number(v) : null; }
+
+// Target pull time: a default for every bean (30 s ± 5), or a custom one per bean whose tolerance scales with it.
+function defTarget(){ const v = Number(settings.targetSec); return v > 0 ? v : DEFAULT_TARGET; }
+function defTol(){ const v = Number(settings.tolSec); return v > 0 ? v : DEFAULT_TOL; }
+function scaledTol(target){ return Math.max(1, Math.round(defTol() * target / defTarget())); }
+function beanWindow(name){
+  const b = name ? beans[name] : null;
+  let target = defTarget(), tol = defTol(), custom = false;
+  if(b && Number(b.targetSec) > 0){
+    custom = true;
+    target = Number(b.targetSec);
+    tol = Number(b.tolSec) > 0 ? Number(b.tolSec) : scaledTol(target);
+  }
+  return { target, tol, lo: Math.max(1, target - tol), hi: target + tol, custom };
 }
+function inRange(pt, name){
+  if(pt == null || pt === '') return false;
+  const w = beanWindow(name);
+  return pt >= w.lo && pt <= w.hi;
+}
+function pullTimeClass(pt, name){
+  if(pt == null || pt === '') return '';
+  return inRange(pt, name) ? 'pull-good' : 'pull-bad';
+}
+// Dose in / yield out, and the ratio between them (18 g in, 36 g out = 1:2)
+function ratioText(inG, outG){
+  const a = Number(inG), b = Number(outG);
+  if(!(a > 0) || !(b > 0)) return '';
+  return '1:' + String(round1(b / a));
+}
+function gramsText(inG, outG){
+  const a = Number(inG), b = Number(outG);
+  if(!(a > 0) || !(b > 0)) return '';
+  return round1(a) + '→' + round1(b) + 'g';
+}
+// Brews and beans with no dose/yield yet are set to 18 g in, 36 g out. Timestamps are untouched, so this never overrides a real edit or a delete.
+function normalizeDose(){
+  let changed = false;
+  logs.forEach(l=>{
+    if(l.doseIn == null && l.yieldOut == null){ l.doseIn = DEFAULT_DOSE; l.yieldOut = DEFAULT_YIELD; changed = true; }
+  });
+  Object.keys(beans).forEach(n=>{
+    const b = beans[n];
+    if(b.doseIn == null && b.yieldOut == null){ b.doseIn = DEFAULT_DOSE; b.yieldOut = DEFAULT_YIELD; changed = true; }
+  });
+  return changed;
+}
+// Wires a dose + yield pair to a live ratio line. With autoScale, changing the dose moves the yield to keep the ratio until you type a yield yourself.
+function bindDoseYield(doseEl, yieldEl, lineEl, autoScale){
+  const st = { auto: !!autoScale, ratio: DEFAULT_YIELD / DEFAULT_DOSE };
+  const paint = ()=>{
+    const t = ratioText(doseEl.value, yieldEl.value);
+    lineEl.innerHTML = t ? `Ratio <b>${t}</b>` : '';
+  };
+  doseEl.addEventListener('input', ()=>{
+    if(st.auto){ const d = parseFloat(doseEl.value); if(d > 0) yieldEl.value = round1(d * st.ratio); }
+    paint();
+  });
+  yieldEl.addEventListener('input', ()=>{
+    st.auto = false;
+    const d = parseFloat(doseEl.value), y = parseFloat(yieldEl.value);
+    if(d > 0 && y > 0) st.ratio = y / d;
+    paint();
+  });
+  return {
+    set(d, y){
+      doseEl.value = d == null ? '' : d;
+      yieldEl.value = y == null ? '' : y;
+      st.auto = !!autoScale;
+      const a = parseFloat(d), b = parseFloat(y);
+      st.ratio = (a > 0 && b > 0) ? b / a : DEFAULT_YIELD / DEFAULT_DOSE;
+      paint();
+    },
+    paint
+  };
+}
+const mainDY = bindDoseYield(doseInput, yieldInput, ratioLine, true);
+const logDY = bindDoseYield(logDose, logYield, logRatio, true);
+const editDY = bindDoseYield(editDose, editYield, editRatio, false);
+mainDY.set(DEFAULT_DOSE, DEFAULT_YIELD);
 function sortedLogsDesc(list){
   return [...list].sort((a,b)=> ((b.date||'') + b.id).localeCompare((a.date||'') + a.id));
 }
@@ -1305,6 +1509,7 @@ function loadData(){
   logs = readJSON(HISTORY_KEY, []);
   removed = readJSON(REMOVED_KEY, {});
   removedLogs = readJSON(REMOVED_LOGS_KEY, {});
+  if(normalizeDose()) saveData();
   renderAll();
 }
 function saveData(){
@@ -1345,7 +1550,8 @@ let openRow = null;
 function beanRowHTML(name, b, archived, i, isNew){
   const n = escapeHtml(name);
   const date = shortDate(b.lastUsed, b.lastUsedDisplay);
-  const meta = escapeHtml(date + (b.comments ? ' · ' + b.comments : ''));
+  const rt = ratioText(b.doseIn, b.yieldOut);
+  const meta = escapeHtml(date + (rt ? ' · ' + rt : '') + (b.comments ? ' · ' + b.comments : ''));
   const pull = b.pullTime != null ? b.pullTime + 's' : '–';
   const grind = b.grindSize != null ? b.grindSize : '–';
   const archLabel = archived ? 'Restore' : 'Archive';
@@ -1357,7 +1563,7 @@ function beanRowHTML(name, b, archived, i, isNew){
     <div class="row-content" role="button" tabindex="0">
       <div class="b-main"><div class="b-name">${n}</div><div class="b-meta">${meta}</div></div>
       <div class="b-num">${grind}</div>
-      <div class="b-num ${pullTimeClass(b.pullTime)}">${pull}</div>
+      <div class="b-num ${pullTimeClass(b.pullTime, name)}">${pull}</div>
     </div>
   </div>`;
 }
@@ -1528,17 +1734,20 @@ function histRow(e, showName){
   const grind = e.grindSize != null ? e.grindSize : '–';
   const note = e.comments ? `<div class="hist-note">${escapeHtml(e.comments)}</div>` : '';
   const main = `<div class="hist-name">${showName ? escapeHtml(e.name) : 'Grind ' + escapeHtml(grind)}</div>${note}`;
-  const right = `<div class="hist-pull ${pullTimeClass(e.pullTime)}">${pull}</div>` +
-                (showName ? `<div class="hist-grind">grind ${escapeHtml(grind)}</div>` : '');
+  const rt = ratioText(e.doseIn, e.yieldOut);
+  const right = `<div class="hist-pull ${pullTimeClass(e.pullTime, e.name)}">${pull}</div>` +
+                (showName ? `<div class="hist-grind">grind ${escapeHtml(grind)}${rt ? ' · ' + rt : ''}</div>` : '');
   return `<div class="hist-row" data-id="${escapeHtml(e.id)}" data-name="${escapeHtml(e.name)}" role="button" tabindex="0">${dateBlock(e.date, e.dateDisplay)}<div class="hist-main">${main}</div><div class="hist-right">${right}</div></div>`;
 }
 
 function brewRow(e){
   const grind = e.grindSize != null ? e.grindSize : '–';
   const pull = e.pullTime != null ? e.pullTime + 's' : '–';
+  const rt = ratioText(e.doseIn, e.yieldOut), gt = gramsText(e.doseIn, e.yieldOut);
   return `<div class="hist-row brew-row" data-id="${escapeHtml(e.id)}" data-name="${escapeHtml(e.name)}" role="button" tabindex="0">` +
     dateBlock(e.date, e.dateDisplay) +
-    `<div class="bv">${escapeHtml(grind)}</div><div class="bv ${pullTimeClass(e.pullTime)}">${pull}</div>` +
+    `<div class="bv">${escapeHtml(grind)}</div><div class="bv ${pullTimeClass(e.pullTime, e.name)}">${pull}</div>` +
+    `<div class="bratio">${rt ? `<b>${rt}</b><span>${gt}</span>` : '–'}</div>` +
     `<div class="bnote">${escapeHtml(e.comments || '')}</div></div>`;
 }
 
@@ -1558,12 +1767,12 @@ function renderHistory(){
   historyList.innerHTML = html;
 }
 
-function beanStats(asc){
+function beanStats(asc, name){
   const pulls = asc.filter(r => r.pullTime != null);
   const avg = pulls.length ? Math.round(pulls.reduce((s, r) => s + r.pullTime, 0) / pulls.length) : null;
   const tally = {};
   asc.forEach((r, i)=>{
-    if(inTarget(r.pullTime) && r.grindSize != null){
+    if(inRange(r.pullTime, name) && r.grindSize != null){
       const k = String(r.grindSize);
       if(!tally[k]) tally[k] = { grind: r.grindSize, count: 0, last: 0 };
       tally[k].count++; tally[k].last = i;
@@ -1573,21 +1782,22 @@ function beanStats(asc){
   return { count: asc.length, avg, sweet: best ? best.grind : null };
 }
 
-function chartSVG(asc){
+function chartSVG(asc, name){
   const pts = asc.filter(r => r.pullTime != null);
   if(!pts.length) return '<div class="empty">No pull times logged yet.</div>';
   const W = 320, H = 124, L = 28, R = 10, T = 10, B = 22;
   const vals = pts.map(p => p.pullTime);
-  const lo = Math.max(0, Math.floor(Math.min(tMin() - 10, Math.min.apply(null, vals) - 3) / 5) * 5);
-  const hi = Math.ceil(Math.max(tMax() + 10, Math.max.apply(null, vals) + 3) / 5) * 5;
+  const w = beanWindow(name);
+  const lo = Math.max(0, Math.floor(Math.min(w.lo - 10, Math.min.apply(null, vals) - 3) / 5) * 5);
+  const hi = Math.ceil(Math.max(w.hi + 10, Math.max.apply(null, vals) + 3) / 5) * 5;
   const y = v => T + (hi - v) / (hi - lo) * (H - T - B);
   const n = pts.length;
   const x = i => n === 1 ? L + (W - L - R) / 2 : L + i * (W - L - R) / (n - 1);
-  const band = `<rect x="${L}" y="${y(tMax()).toFixed(1)}" width="${W - L - R}" height="${(y(tMin()) - y(tMax())).toFixed(1)}" fill="var(--pull-good)" opacity=".13" rx="3"/>`;
-  const labels = [tMin(), tMax()].map(v => `<text x="${L - 5}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end" class="ch-t">${v}</text>`).join('');
+  const band = `<rect x="${L}" y="${y(w.hi).toFixed(1)}" width="${W - L - R}" height="${(y(w.lo) - y(w.hi)).toFixed(1)}" fill="var(--pull-good)" opacity=".13" rx="3"/>`;
+  const labels = [w.lo, w.hi].map(v => `<text x="${L - 5}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end" class="ch-t">${v}</text>`).join('');
   const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.pullTime).toFixed(1)}`).join(' ');
   const line = n > 1 ? `<path d="${d}" pathLength="1" class="ch-line" fill="none"/>` : '';
-  const dots = pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.pullTime).toFixed(1)}" r="3.4" class="ch-dot ${inTarget(p.pullTime) ? 'g' : 'b'}" style="animation-delay:${Math.min(i * 25, 600) + 250}ms"/>`).join('');
+  const dots = pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.pullTime).toFixed(1)}" r="3.4" class="ch-dot ${inRange(p.pullTime, name) ? 'g' : 'b'}" style="animation-delay:${Math.min(i * 25, 600) + 250}ms"/>`).join('');
   const x1 = `<text x="${L}" y="${H - 5}" class="ch-t">${escapeHtml(shortDate(pts[0].date))}</text>`;
   const x2 = n > 1 ? `<text x="${W - R}" y="${H - 5}" text-anchor="end" class="ch-t">${escapeHtml(shortDate(pts[n - 1].date))}</text>` : '';
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pull time trend, green band is your target window">${band}${labels}${line}${dots}${x1}${x2}</svg>`;
@@ -1597,7 +1807,8 @@ let detailName = null;
 function renderDetail(name){
   const rows = sortedLogsDesc(logs.filter(l => l.name === name));
   const asc = [...rows].reverse();
-  const st = beanStats(asc);
+  const st = beanStats(asc, name);
+  const w = beanWindow(name);
   detailNameEl.textContent = name;
   detailSub.textContent = rows.length
     ? `Last brewed ${shortDate(rows[0].date, rows[0].dateDisplay)}${beans[name] && beans[name].archived ? ' · archived' : ''}`
@@ -1606,7 +1817,8 @@ function renderDetail(name){
     `<div class="stat"><b>${st.count}</b><span>Brews</span></div>` +
     `<div class="stat"><b>${st.avg != null ? st.avg + 's' : '–'}</b><span>Avg pull</span></div>` +
     `<div class="stat"><b>${st.sweet != null ? escapeHtml(st.sweet) : '–'}</b><span>Sweet spot</span></div>`;
-  detailChart.innerHTML = chartSVG(asc);
+  targetChipText.innerHTML = `Target ${w.target} s ± ${w.tol}` + (w.custom ? '' : ' <small>default</small>');
+  detailChart.innerHTML = chartSVG(asc, name);
   detailList.innerHTML = rows.map(brewRow).join('');
 }
 
@@ -1677,10 +1889,11 @@ function grindAdvice(name){
   const existing = beans[name];
   if(!existing || existing.pullTime == null) return null;
   const pt = existing.pullTime;
-  if(inTarget(pt)){
+  const w = beanWindow(name);
+  if(inRange(pt, name)){
     return { cls: 'good', arrow: '✓', text: `Last pull was ${pt}s — dialed in. Same grind should work.` };
   }
-  const needFiner = pt < tMin();
+  const needFiner = pt < w.lo;
   const lowerIsFiner = settings.grindDirection === 'lowerFiner';
   const goLower = needFiner ? lowerIsFiner : !lowerIsFiner;
   return {
@@ -1703,6 +1916,7 @@ function showGrindHint(name){
 }
 
 // ---------- log a brew ----------
+let formPrefilled = false;
 beanInput.addEventListener('input', ()=>{
   const name = beanInput.value.trim();
   const hasValue = name.length > 0;
@@ -1714,6 +1928,11 @@ beanInput.addEventListener('input', ()=>{
       grindInput.value = existing.grindSize ?? '';
       timeInput.value = existing.pullTime ?? '';
       commentsInput.value = existing.comments ?? '';
+      mainDY.set(existing.doseIn ?? DEFAULT_DOSE, existing.yieldOut ?? DEFAULT_YIELD);
+      formPrefilled = true;
+    }else if(formPrefilled){                // moved from a known bean to a new name: back to 18 g in, 36 g out
+      mainDY.set(DEFAULT_DOSE, DEFAULT_YIELD);
+      formPrefilled = false;
     }
     showGrindHint(name);
   }else{
@@ -1731,9 +1950,12 @@ function addBrew(o){
     dateDisplay: displayDate(o.date),
     grindSize: o.grind !== '' && o.grind != null ? Number(o.grind) : null,
     pullTime: o.time !== '' && o.time != null ? Number(o.time) : null,
+    doseIn: numOrNull(o.dose),
+    yieldOut: numOrNull(o.yield),
     comments: String(o.comments || '').trim(),
     updated: Date.now()
   };
+  if(entry.doseIn == null && entry.yieldOut == null){ entry.doseIn = DEFAULT_DOSE; entry.yieldOut = DEFAULT_YIELD; }
   logs.push(entry);
   reconcileBean(o.name, true);          // the bean row mirrors its newest brew by date
   beans[o.name].archived = 0;           // logging a brew also un-archives the bean
@@ -1750,11 +1972,13 @@ saveBtn.addEventListener('click', ()=>{
     beanInput.classList.remove('shake'); void beanInput.offsetWidth; beanInput.classList.add('shake');
     return;
   }
-  const entry = addBrew({ name, date: isoToday(), grind: grindInput.value, time: timeInput.value, comments: commentsInput.value });
+  const entry = addBrew({ name, date: isoToday(), grind: grindInput.value, time: timeInput.value, dose: doseInput.value, yield: yieldInput.value, comments: commentsInput.value });
 
   beanInput.value = '';
   grindInput.value = '';
   timeInput.value = '';
+  mainDY.set(DEFAULT_DOSE, DEFAULT_YIELD);
+  formPrefilled = false;
   commentsInput.value = '';
   revealSection.classList.remove('open');
   grindHint.style.display = 'none';
@@ -1819,6 +2043,7 @@ function applyState(state){
   logs = state.logs;
   removed = state.removed;
   removedLogs = state.removedLogs || {};
+  normalizeDose();
   saveData();
   renderAll();
 }
@@ -1861,15 +2086,21 @@ function reconcileBean(name, create){
   }
   if(!beans[name] && !create) return;     // never resurrect a bean the user removed
   const l = mine[0];
-  beans[name] = {
+  const prev = beans[name] || {};
+  const next = {
     lastUsed: l.date,
     lastUsedDisplay: l.dateDisplay,
     grindSize: l.grindSize,
     pullTime: l.pullTime,
+    doseIn: l.doseIn == null ? null : l.doseIn,
+    yieldOut: l.yieldOut == null ? null : l.yieldOut,
     comments: l.comments || '',
     updated: Date.now(),
-    archived: beans[name] && beans[name].archived ? 1 : 0
+    archived: prev.archived ? 1 : 0
   };
+  if(Number(prev.targetSec) > 0) next.targetSec = prev.targetSec;      // a bean keeps its own pull target
+  if(Number(prev.tolSec) > 0) next.tolSec = prev.tolSec;
+  beans[name] = next;
 }
 function afterLogChange(){
   saveData();
@@ -1891,6 +2122,7 @@ function openEdit(id, source){
   editDate.value = parseISO(e.date) ? String(e.date).slice(0, 10) : '';
   editGrind.value = e.grindSize ?? '';
   editTime.value = e.pullTime ?? '';
+  editDY.set(e.doseIn, e.yieldOut);
   editComments.value = e.comments || '';
   editSub.textContent = e.dateDisplay || shortDate(e.date);
   editViewBean.style.display = editSource === 'history' ? '' : 'none';
@@ -1917,9 +2149,12 @@ function saveEdit(){
     dateDisplay: d ? d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }) : e.dateDisplay,
     grindSize: editGrind.value !== '' ? Number(editGrind.value) : null,
     pullTime: editTime.value !== '' ? Number(editTime.value) : null,
+    doseIn: numOrNull(editDose.value),
+    yieldOut: numOrNull(editYield.value),
     comments: editComments.value.trim(),
     updated: Date.now()
   });
+  if(e.doseIn == null && e.yieldOut == null){ e.doseIn = DEFAULT_DOSE; e.yieldOut = DEFAULT_YIELD; }
   reconcileBean(oldName, false);
   if(newName !== oldName) reconcileBean(newName, true);
   closeEdit();
@@ -1965,6 +2200,7 @@ function openLogSheet(name){
   logDate.value = isoToday();
   logGrind.value = b && b.grindSize != null ? b.grindSize : '';
   logTime.value = b && b.pullTime != null ? b.pullTime : '';
+  logDY.set(b && b.doseIn != null ? b.doseIn : DEFAULT_DOSE, b && b.yieldOut != null ? b.yieldOut : DEFAULT_YIELD);
   logComments.value = b && b.comments ? b.comments : '';
   paintHint(logHint, logHintArrow, logHintText, grindAdvice(name));
   logBackdrop.classList.add('open');
@@ -1977,7 +2213,7 @@ function saveLogSheet(){
   const name = logTarget;
   if(!name) return;
   const iso = logDate.value && parseISO(logDate.value) ? logDate.value : isoToday();
-  const entry = addBrew({ name, date: iso, grind: logGrind.value, time: logTime.value, comments: logComments.value });
+  const entry = addBrew({ name, date: iso, grind: logGrind.value, time: logTime.value, dose: logDose.value, yield: logYield.value, comments: logComments.value });
   closeLogSheet();
   toast(`Logged ${name}${entry.pullTime != null ? ' · ' + entry.pullTime + 's' : ''}`);
 }
@@ -2038,11 +2274,76 @@ function enableSwipeBack(view){
 enableSwipeBack(detailView);
 enableSwipeBack(historyView);
 
+// ---------- a bean's own pull target ----------
+let tgName = null, tgTarget = DEFAULT_TARGET, tgTol = DEFAULT_TOL, tgAuto = true;
+function paintTarget(){
+  tgTargetVal.textContent = tgTarget + ' s';
+  tgTolVal.textContent = '± ' + tgTol + ' s';
+  const lo = Math.max(1, tgTarget - tgTol), hi = tgTarget + tgTol;
+  tgNote.textContent = `Green when a pull is ${lo}–${hi} s, red outside.` + (tgAuto ? ' The tolerance scales with the target.' : '');
+}
+function openTargetSheet(name){
+  if(!name || !beans[name]) return;
+  tgName = name;
+  const w = beanWindow(name);
+  tgTarget = w.target;
+  tgTol = w.tol;
+  tgAuto = !(Number(beans[name].tolSec) > 0);
+  targetSub.textContent = name;
+  paintTarget();
+  targetBackdrop.classList.add('open');
+}
+function closeTargetSheet(){
+  targetBackdrop.classList.remove('open');
+  tgName = null;
+}
+function stepTarget(key, delta){
+  if(key === 'target'){
+    tgTarget = clampN(tgTarget + delta, 5, 180);
+    if(tgAuto) tgTol = Math.min(scaledTol(tgTarget), tgTarget - 1);
+  }else{
+    tgTol = clampN(tgTol + delta, 1, Math.min(60, tgTarget - 1));
+    tgAuto = false;                          // you set the tolerance yourself, so it stops following the target
+  }
+  paintTarget();
+}
+function saveBeanTarget(useDefault){
+  const b = beans[tgName];
+  if(!b){ closeTargetSheet(); return; }
+  const next = Object.assign({}, b, { updated: Date.now() });
+  const isDefault = useDefault || (tgTarget === defTarget() && tgAuto);
+  delete next.targetSec;
+  delete next.tolSec;
+  if(!isDefault){
+    next.targetSec = tgTarget;
+    if(!tgAuto) next.tolSec = tgTol;
+  }
+  beans[tgName] = next;
+  closeTargetSheet();
+  saveData();
+  renderAll();
+  queueSync();
+  toast(isDefault ? 'Using the default target' : 'Target saved');
+}
+targetChip.addEventListener('click', ()=> openTargetSheet(detailName));
+targetCloseBtn.addEventListener('click', closeTargetSheet);
+targetBackdrop.addEventListener('click', (e)=>{ if(e.target === targetBackdrop) closeTargetSheet(); });
+targetSaveBtn.addEventListener('click', ()=> saveBeanTarget(false));
+targetDefaultBtn.addEventListener('click', ()=> saveBeanTarget(true));
+targetSheet.addEventListener('click', (e)=>{
+  const b = e.target.closest ? e.target.closest('.stepper button') : null;
+  if(!b) return;
+  stepTarget(b.parentNode.getAttribute('data-key'), Number(b.getAttribute('data-d')));
+});
+
 // ---------- settings panel (gear) ----------
 function applyTargetUI(){
-  tMinVal.textContent = tMin() + ' s';
-  tMaxVal.textContent = tMax() + ' s';
-  targetResetBtn.disabled = (tMin() === 25 && tMax() === 35);
+  tTargetVal.textContent = defTarget() + ' s';
+  tTolVal.textContent = '± ' + defTol() + ' s';
+  const lo = Math.max(1, defTarget() - defTol()), hi = defTarget() + defTol();
+  targetNote.textContent = `Green window: ${lo}–${hi} s. Outside it shows red. A bean can have its own target on its page, and its window scales with it.`;
+  targetResetBtn.textContent = 'Reset to ' + DEFAULT_TARGET + ' s ± ' + DEFAULT_TOL;
+  targetResetBtn.disabled = (defTarget() === DEFAULT_TARGET && defTol() === DEFAULT_TOL);
 }
 function onTargetChanged(){
   saveSettings();
@@ -2052,11 +2353,12 @@ function onTargetChanged(){
   if(name) showGrindHint(name);
 }
 function setTarget(key, delta){
-  let lo = tMin(), hi = tMax();
-  if(key === 'targetMin') lo = Math.max(5, Math.min(lo + delta, hi - 2));
-  else hi = Math.min(120, Math.max(hi + delta, lo + 2));
-  settings.targetMin = lo;
-  settings.targetMax = hi;
+  let t = defTarget(), tol = defTol();
+  if(key === 'targetSec') t = clampN(t + delta, 5, 180);
+  else tol = clampN(tol + delta, 1, 60);
+  tol = Math.min(tol, t - 1);
+  settings.targetSec = t;
+  settings.tolSec = tol;
   onTargetChanged();
 }
 function openSettings(){
@@ -2076,8 +2378,8 @@ settingsSheet.addEventListener('click', (e)=>{
   setTarget(b.parentNode.getAttribute('data-key'), Number(b.getAttribute('data-d')));
 });
 targetResetBtn.addEventListener('click', ()=>{
-  settings.targetMin = 25;
-  settings.targetMax = 35;
+  settings.targetSec = DEFAULT_TARGET;
+  settings.tolSec = DEFAULT_TOL;
   onTargetChanged();
 });
 
@@ -2086,7 +2388,14 @@ loadData();
 
 // --- Settings (theme, grind direction, sheet sync) ---
 function loadSettings(){
-  settings = Object.assign(settings, readJSON(SETTINGS_KEY, {}));
+  const stored = readJSON(SETTINGS_KEY, {});
+  settings = Object.assign(settings, stored);
+  if(stored.targetSec == null && (stored.targetMin != null || stored.targetMax != null)){   // the old "fastest–slowest" window becomes target ± tolerance
+    const lo = Number(stored.targetMin) || 25, hi = Number(stored.targetMax) || 35;
+    settings.targetSec = Math.round((lo + hi) / 2);
+    settings.tolSec = Math.max(1, Math.round((hi - lo) / 2));
+  }
+  delete settings.targetMin; delete settings.targetMax;
   if(!settings.theme){
     settings.theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
   }
